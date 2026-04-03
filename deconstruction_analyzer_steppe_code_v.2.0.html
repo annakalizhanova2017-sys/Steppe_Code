@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deconstruction Analyzer Steppe Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --bg:       #0c0905;
+            --gold-hi:  #e0b830;
+            --gold-mid: #b08020;
+            --gold-lo:  #785810;
+            --gold-line:#c09428;
+            --parch:    #f4ead6;
+            --parch-2:  #ead9bc;
+            --parch-3:  #d9c49a;
+            --parch-4:  #c8ae7e;
+            --ink:      #0d0700;
+            --ink-2:    #251600;
+            --ink-3:    #4a3000;
+            --ink-4:    #6b4a10;
+            --sky:      #1c3a58;
+            --grass:    #1e4228;
+            --terra:    #6a2010;
+            --panel-bg: #ede0c4;
+            --surface:  #e8d8b8;
+        }
+
+        /* ===== BODY — dark steppe with diamond lattice ===== */
+        body {
+            font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 3L45 24L24 45L3 24Z' fill='none' stroke='%23b8880a' stroke-width='0.6' opacity='0.2'/%3E%3Cpath d='M24 13L35 24L24 35L13 24Z' fill='none' stroke='%23b8880a' stroke-width='0.4' opacity='0.1'/%3E%3Ccircle cx='24' cy='3' r='1.2' fill='%23c8a020' opacity='0.18'/%3E%3Ccircle cx='45' cy='24' r='1.2' fill='%23c8a020' opacity='0.18'/%3E%3Ccircle cx='24' cy='45' r='1.2' fill='%23c8a020' opacity='0.18'/%3E%3Ccircle cx='3' cy='24' r='1.2' fill='%23c8a020' opacity='0.18'/%3E%3C/svg%3E");
+            padding: 36px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1520px;
+            width: 100%;
+            background: var(--parch);
+            border-radius: 2px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(180,130,20,0.35), inset 0 0 0 3px rgba(200,150,30,0.08);
+            overflow: hidden;
+            border: 1px solid var(--gold-line);
+        }
+
+        /* ===== HEADER ===== */
+        .site-header {
+            background: linear-gradient(175deg, #1c1408 0%, #0c0905 100%);
+            padding: 36px 40px 28px;
+            border-bottom: 1px solid var(--gold-line);
+            position: relative;
+            overflow: hidden;
+        }
+        .site-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 3L45 24L24 45L3 24Z' fill='none' stroke='%23c8a820' stroke-width='0.5' opacity='0.12'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .header-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold-line) 30%, var(--gold-hi) 50%, var(--gold-line) 70%, transparent 100%);
+            margin: 14px 0 16px;
+        }
+        h1 {
+            font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+            color: var(--gold-hi);
+            text-align: center;
+            font-size: 2.1rem;
+            font-weight: 400;
+            letter-spacing: 9px;
+            text-transform: uppercase;
+            text-shadow: 0 0 60px rgba(200,160,20,0.25), 0 1px 3px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .header-tagline {
+            text-align: center;
+            color: var(--gold-mid);
+            font-size: 0.78rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-weight: 300;
+            opacity: 0.85;
+        }
+
+        /* ===== INNER WRAPPER ===== */
+        .inner { padding: 28px 35px 40px; }
+
+        /* ===== BUTTONS ===== */
+        .button-row {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0 16px;
+        }
+        .btn {
+            background: transparent;
+            border: 1px solid var(--gold-mid);
+            padding: 7px 16px;
+            border-radius: 2px;
+            color: var(--ink-2);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.14s ease;
+            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+        }
+        .btn:hover {
+            background: var(--gold-mid);
+            color: var(--ink);
+            border-color: var(--gold-mid);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        }
+        .btn.active { background: var(--ink); color: var(--gold-hi); border-color: var(--gold-line); }
+
+        /* ===== MODULE ROW ===== */
+        .module-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--surface);
+            border: 1px solid var(--parch-4);
+            border-radius: 2px;
+            padding: 11px 20px;
+            margin: 10px 0 20px;
+        }
+        .module-row label { font-weight: 600; color: var(--ink-2); font-size: 0.85rem; }
+        .module-row select, .module-row input[type="text"] {
+            padding: 5px 12px;
+            border-radius: 2px;
+            border: 1px solid var(--parch-4);
+            background: var(--parch);
+            font-size: 0.85rem;
+            color: var(--ink-2);
+            font-family: inherit;
+        }
+
+        /* ===== GRID INPUTS ===== */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 14px;
+            margin: 20px 0;
+        }
+        @media (max-width:1100px) { .grid-inputs { grid-template-columns: 1fr 1fr; } }
+        @media (max-width:600px)  { .grid-inputs { grid-template-columns: 1fr; } }
+
+        .input-box {
+            background: var(--parch-2);
+            border: 1px solid var(--parch-4);
+            border-top: 3px solid var(--gold-mid);
+            border-radius: 0 0 2px 2px;
+            padding: 14px 12px 12px;
+        }
+        .input-box-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .slot-label-wrap { flex: 1; }
+        .slot-label {
+            display: block;
+            color: var(--ink-2);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            outline: none;
+            cursor: text;
+            padding: 2px 4px;
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.15s;
+        }
+        .slot-label:focus { border-bottom-color: var(--gold-mid); }
+        .file-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-mini {
+            background: var(--parch);
+            border: 1px solid var(--parch-4);
+            padding: 3px 9px;
+            border-radius: 2px;
+            color: var(--ink-3);
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.12s;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-mini:hover { background: var(--gold-mid); color: var(--ink); border-color: var(--gold-mid); }
+        .btn-mini.danger { color: var(--terra); border-color: #c4a0a0; }
+        .btn-mini.danger:hover { background: var(--terra); color: white; border-color: var(--terra); }
+
+        .drop-zone {
+            border: 1px dashed var(--parch-4);
+            border-radius: 2px;
+            padding: 6px 10px;
+            text-align: center;
+            font-size: 0.73rem;
+            color: var(--ink-4);
+            margin-bottom: 7px;
+            transition: 0.18s;
+            background: rgba(255,255,255,0.25);
+            cursor: pointer;
+        }
+        .drop-zone.drag-over { background: rgba(180,130,20,0.18); border-color: var(--gold-mid); color: var(--ink-2); }
+        textarea {
+            width: 100%;
+            height: 172px;
+            padding: 10px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid var(--parch-4);
+            border-radius: 1px;
+            font-family: 'Courier New', monospace;
+            font-size: 12.5px;
+            resize: vertical;
+            color: var(--ink);
+            line-height: 1.5;
+        }
+        textarea:focus { outline: none; border-color: var(--gold-mid); background: rgba(255,255,255,0.7); }
+        .word-count { font-size: 0.7rem; color: var(--ink-4); text-align: right; margin-top: 4px; font-family: monospace; }
+        .file-loaded-badge {
+            font-size: 0.7rem;
+            background: var(--grass);
+            color: #e0ffe4;
+            padding: 2px 8px;
+            border-radius: 2px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* ===== ANALYZE BUTTON ===== */
+        .analyze-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--ink);
+            border: 1px solid var(--gold-line);
+            border-radius: 2px;
+            color: var(--gold-hi);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 10px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            text-transform: uppercase;
+            margin: 20px 0;
+            transition: 0.15s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .analyze-btn:hover { background: #2a1e08; box-shadow: 0 6px 30px rgba(0,0,0,0.35); }
+
+        /* ===== RESULTS ===== */
+        .results-grid {
+            display: none;
+            margin-top: 30px;
+            border: 1px solid var(--parch-4);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .results-top {
+            display: grid;
+            grid-template-columns: 1fr 1.55fr;
+            gap: 0;
+        }
+        @media (max-width:900px) { .results-top { grid-template-columns: 1fr; } }
+
+        .chart-section {
+            background: var(--parch-2);
+            padding: 24px;
+            border-right: 1px solid var(--parch-4);
+        }
+        .metrics-section {
+            background: var(--parch);
+            padding: 24px;
+        }
+        .chart-section h3, .metrics-section h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ink-2);
+            border-bottom: 1px solid var(--parch-4);
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+        }
+        .legend-box {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--parch-4);
+            border-radius: 2px;
+            font-size: 0.8rem;
+            color: var(--ink-2);
+        }
+        .color-box { width: 14px; height: 14px; border-radius: 1px; border: 1px solid rgba(0,0,0,0.2); display: inline-block; vertical-align: middle; margin-right: 4px; }
+        .cb-1 { background: #2a4a70; } .cb-2 { background: #2a6038; } .cb-3 { background: #7a3018; } .cb-4 { background: #8a6010; }
+
+        /* Radar SVG */
+        .radar-chart { width:100%; max-width:360px; margin:0 auto; display:block; }
+        .grid-circle { fill:none; stroke:var(--parch-4); stroke-dasharray:3 3; }
+        .axis-line { stroke:var(--parch-3); stroke-width:1; }
+        .axis-label { font-size:9.5px; fill:var(--ink-2); font-weight:600; font-family:'Source Sans 3',sans-serif; }
+
+        /* Metrics */
+        .metric-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 600;
+            font-size: 0.92rem;
+            letter-spacing: 0.5px;
+            margin: 14px 0 4px;
+            color: var(--ink-2);
+            border-bottom: 1px solid var(--parch-3);
+            padding-bottom: 3px;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            padding: 4px 0;
+            border-bottom: 1px dotted var(--parch-3);
+            color: var(--ink-2);
+        }
+        .shift-badge {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 1px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 5px;
+            letter-spacing: 0.3px;
+        }
+        .shift-decolon { background: var(--grass); color: #e8ffe8; }
+        .shift-colonial { background: var(--terra); color: #ffe8e8; }
+        .shift-neutral   { background: var(--ink-3); color: #fff8e8; }
+
+        /* ===== STRATEGY PANEL ===== */
+        .strategy-panel {
+            background: var(--surface);
+            border-top: 1px solid var(--parch-4);
+            padding: 24px;
+        }
+        .strategy-panel h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ink-2);
+            border-bottom: 1px solid var(--parch-4);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .strat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width:1000px) { .strat-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width:600px)  { .strat-grid { grid-template-columns: 1fr; } }
+        .strat-card {
+            background: var(--parch);
+            border: 1px solid var(--parch-4);
+            border-top: 2px solid var(--gold-lo);
+            border-radius: 0 0 2px 2px;
+            padding: 13px;
+        }
+        .strat-card h4 { font-size: 0.78rem; color: var(--ink-2); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.3px; }
+        .strat-bar-wrap { background: var(--parch-3); border-radius: 1px; height: 10px; margin: 4px 0; overflow: hidden; }
+        .strat-bar { height: 10px; border-radius: 1px; transition: width 0.5s ease; }
+        .strat-bar.s1 { background: #2a4a70; } .strat-bar.s2 { background: #2a6038; } .strat-bar.s3 { background: #7a3018; }
+        .strat-hits { font-size: 0.72rem; color: var(--ink-3); margin-top: 6px; max-height: 70px; overflow-y: auto; line-height: 1.6; }
+        .strat-hits span { background: var(--parch-3); border-radius: 1px; padding: 1px 5px; margin: 1px 2px; display: inline-block; font-size: 0.7rem; }
+
+        /* ===== PANELS ===== */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--parch-4);
+            border-left: 3px solid var(--gold-mid);
+            border-radius: 2px;
+            padding: 20px 22px;
+            margin: 14px 0;
+        }
+        .panel h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            color: var(--ink-2);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--parch-4);
+            padding-bottom: 8px;
+        }
+
+        /* СЛОВАРЬ */
+        .dict-cols { display: flex; gap: 16px; flex-wrap: wrap; }
+        .dict-col { flex: 1 1 190px; }
+        .dict-col h4 { margin-bottom:6px; color:var(--ink-2); font-size:0.82rem; font-weight:600; letter-spacing:0.5px; }
+        .word-list { background: var(--parch); padding: 8px; border-radius: 2px; max-height: 240px; overflow-y: auto; border: 1px solid var(--parch-4); }
+        .word-list li { display: flex; justify-content: space-between; align-items: center; padding: 3px 2px; border-bottom: 1px dotted var(--parch-3); font-size: 0.8rem; color: var(--ink-2); }
+        .word-list button { background: var(--terra); color: white; border: none; border-radius: 1px; width: 18px; height: 18px; cursor: pointer; font-size: 0.7rem; line-height: 1; }
+        .word-list button:hover { background: #a03020; }
+        .add-word-form { display: flex; flex-direction: column; gap: 8px; background: var(--parch); padding: 14px; border-radius: 2px; margin-top: 16px; border: 1px solid var(--parch-4); }
+        .add-word-form h4 { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
+        .add-word-form input, .add-word-form select { padding: 6px 10px; border-radius: 2px; border: 1px solid var(--parch-4); background: var(--parch); font-size: 0.82rem; color: var(--ink-2); font-family: inherit; }
+
+        /* КОЛЛОКАЦИИ */
+        .colloc-block { background: var(--surface); border: 1px solid var(--parch-4); border-radius: 2px; padding: 14px; margin: 14px 0; }
+        .colloc-block h4 { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 8px; }
+        .colloc-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .colloc-item { background: var(--parch-3); border: 1px solid var(--parch-4); padding: 2px 8px; border-radius: 1px; font-size: 0.76rem; color: var(--ink-2); }
+
+        /* КОММЕНТАРИЙ */
+        .comment-box { background: var(--parch); border-left: 3px solid var(--gold-lo); padding: 14px; border-radius: 2px; margin: 12px 0; }
+        .comment-box h4 { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
+        .comment-box textarea { width:100%; height:55px; margin-top:6px; border-radius:2px; border-color:var(--parch-4); font-size:0.82rem; }
+
+        /* СКАНИРОВАНИЕ */
+        .scan-item { margin: 4px 0; background: var(--parch); padding: 5px 10px; border-radius: 2px; border: 1px solid var(--parch-4); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-2); }
+
+        /* ИСТОРИЯ */
+        .history-entry { background: var(--parch); border-radius: 2px; padding: 10px 14px; margin: 6px 0; font-size: 0.82rem; border-left: 3px solid var(--gold-lo); border: 1px solid var(--parch-4); border-left-width: 3px; }
+        .history-entry .he-meta { font-weight: 600; color: var(--ink-2); margin-bottom: 3px; }
+        .history-entry .he-scores { color: var(--ink-3); }
+
+        /* ЗАГРУЗКА ФАЙЛОВ */
+        .load-panel { /* uses .panel base */ }
+        .load-panel p { font-size: 0.83rem; color: var(--ink-3); margin-bottom: 12px; line-height: 1.5; }
+        .load-note {
+            background: rgba(106,32,16,0.07);
+            border-left: 3px solid var(--terra);
+            padding: 10px 14px;
+            border-radius: 2px;
+            font-size: 0.78rem;
+            color: var(--ink-2);
+            margin-top: 12px;
+            line-height: 1.55;
+        }
+        .global-drop {
+            border: 1px dashed var(--gold-mid);
+            border-radius: 2px;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.88rem;
+            color: var(--ink-3);
+            background: rgba(255,255,255,0.35);
+            cursor: pointer;
+            transition: 0.18s;
+        }
+        .global-drop.drag-over { background: rgba(180,130,20,0.1); border-color: var(--gold-hi); color: var(--ink-2); }
+        .load-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+        .load-controls select { padding: 6px 12px; border-radius: 2px; border: 1px solid var(--parch-4); background: var(--parch); font-size: 0.82rem; color: var(--ink-2); font-family: inherit; }
+        .load-controls label { font-size: 0.82rem; color: var(--ink-2); }
+
+        /* SHIFT SUMMARY */
+        #shiftSummary { font-size: 0.82rem; color: var(--ink-2); margin-top: 14px; line-height: 1.7; }
+
+        /* SCROLLBARS */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--parch-3); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-lo); border-radius: 2px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="site-header">
+        <h1>Deconstruction Analyzer Steppe Code</h1>
+        <div class="header-line"></div>
+        <div class="header-tagline">повышение · нейтрализация · экспликация · агентизация · деколониальный анализ дискурса</div>
+    </div>
+
+    <div class="inner">
+
+    <div class="button-row">
+        <button class="btn" onclick="togglePanel('loadPanel')">📂 ЗАГРУЗИТЬ ФАЙЛ</button>
+        <button class="btn" onclick="togglePanel('dictPanel')">📚 СЛОВАРЬ</button>
+        <button class="btn" onclick="togglePanel('scanPanel')">🔍 НОВЫЕ СЛОВА</button>
+        <button class="btn" onclick="togglePanel('histPanel')">🕰 ИСТОРИЯ АНАЛИЗОВ</button>
+        <button class="btn" onclick="exportAll()">📥 ЭКСПОРТ (JSON)</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()">📤 ИМПОРТ</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importDictionary(event)">
+        <button class="btn" onclick="clearAll()">🗑 ОЧИСТИТЬ ПОЛЯ</button>
+    </div>
+
+    <!-- MODULE ROW -->
+    <div class="module-row">
+        <label>📂 Модуль корпуса:</label>
+        <select id="corpusModule">
+            <option value="">— выберите —</option>
+            <option value="Pyramid Karazhartas">Пирамида Каражартас (K-xx)</option>
+            <option value="Saryarka Petroglyphs">Петроглифы Сарыарки (P-xx)</option>
+            <option value="Botai Culture">Ботайская культура (B-xx)</option>
+            <option value="Timur Stone">Камень Тимура (T-xx)</option>
+            <option value="Bronze Age Ceramics">Керамика бронзового века (C-xx)</option>
+            <option value="Multi-module">Несколько модулей</option>
+        </select>
+        <label>ID строк:</label>
+        <input type="text" id="corpusIds" placeholder="K-02, K-04, K-17..." style="width:200px;">
+        <label>Сессия:</label>
+        <input type="text" id="sessionLabel" placeholder="сессия / дата" style="width:150px;">
+    </div>
+
+    <!-- СЛОВАРЬ -->
+    <div id="dictPanel" class="panel" style="display:none;">
+        <h3>📖 РЕДАКТОР БИНАРНЫХ ОППОЗИЦИЙ</h3>
+        <div class="dict-cols" id="dictLists"></div>
+        <div class="add-word-form">
+            <h4>➕ ДОБАВИТЬ СЛОВО / PHRASE</h4>
+            <input type="text" id="newWord" placeholder="слово или словосочетание">
+            <select id="newOpp">
+                <option value="Nomadic vs Sedentary">Nomadic vs Sedentary</option>
+                <option value="Civilization vs Barbarism">Civilization vs Barbarism</option>
+                <option value="Ancient vs Modern">Ancient vs Modern</option>
+                <option value="Nature vs Culture">Nature vs Culture</option>
+                <option value="East vs West (Orientalism)">East vs West (Orientalism)</option>
+                <option value="Sacred vs Profane">Sacred vs Profane ★ нов.</option>
+                <option value="Indigenous Agency vs Colonial Gaze">Indigenous Agency vs Colonial Gaze ★ нов.</option>
+            </select>
+            <select id="newPole">
+                <option value="A">Полюс A (кочевой/автохтонный/сакральный/деколониальный)</option>
+                <option value="B">Полюс B (оседлый/западный/профанный/колониальный)</option>
+            </select>
+            <button class="btn" onclick="addWord()">ДОБАВИТЬ</button>
+        </div>
+    </div>
+
+    <!-- СКАНИРОВАНИЕ -->
+    <div id="scanPanel" class="panel" style="display:none;">
+        <h3>🔎 АВТОМАТИЧЕСКОЕ ПОПОЛНЕНИЕ СЛОВАРЯ</h3>
+        <p style="margin-bottom:10px; font-size:0.9rem;">Вставьте тексты в поля ввода, затем нажмите кнопку. Программа покажет слова, которых ещё нет в словаре.</p>
+        <button class="btn" onclick="scanNewWords()">🔎 НАЙТИ НОВЫЕ СЛОВА</button>
+        <div id="scanResults" style="margin-top:15px;"></div>
+    </div>
+
+    <!-- ИСТОРИЯ -->
+    <div id="histPanel" class="panel" style="display:none;">
+        <h3>🕰 ИСТОРИЯ АНАЛИЗОВ</h3>
+        <button class="btn" onclick="clearHistory()" style="margin-bottom:10px;">🗑 Очистить историю</button>
+        <div id="historyList"></div>
+    </div>
+
+    <!-- ПАНЕЛЬ ЗАГРУЗКИ ФАЙЛОВ -->
+    <div id="loadPanel" class="load-panel" style="display:none;">
+        <h3>📂 ЗАГРУЗИТЬ ТЕКСТОВЫЙ ФАЙЛ</h3>
+        <p>Перетащите файл в любое поле ниже или выберите файл и укажите, в какой слот его загрузить. Названия слотов можно переименовать — кликните прямо на заголовок поля.</p>
+
+        <div class="global-drop" id="globalDrop"
+             ondragover="globalDragOver(event)"
+             ondragleave="globalDragLeave(event)"
+             ondrop="globalDrop(event)">
+            📄 Перетащите .txt файл сюда или нажмите для выбора
+            <input type="file" id="globalFileInput" accept=".txt,.md,.csv" style="display:none" onchange="globalFileChosen(event)">
+        </div>
+
+        <div class="load-controls">
+            <label>Загрузить в слот:</label>
+            <select id="globalTargetSlot">
+                <option value="1">Слот 1</option>
+                <option value="2">Слот 2</option>
+                <option value="3">Слот 3</option>
+                <option value="4">Слот 4</option>
+            </select>
+            <label>
+                <input type="checkbox" id="autoScanAfterLoad" checked>
+                Автоматически открыть сканер слов после загрузки
+            </label>
+        </div>
+
+        <div class="load-note">
+            ⚠️ <strong>Поддерживаемые форматы: .txt, .md, .csv</strong> — любые текстовые файлы в кодировке UTF-8.<br>
+            Файлы <strong>.pdf, .docx, .doc</strong> браузер читать напрямую не может — это ограничение технологии, а не программы.
+            Чтобы загрузить PDF или Word: откройте файл → выделите весь текст (Ctrl+A) → скопируйте → вставьте в поле вручную.
+            Или сохраните документ как .txt через «Сохранить как...» в Word / «Экспорт в текст» в Acrobat.
+        </div>
+    </div>
+
+    <!-- ПОЛЯ ВВОДА -->
+    <div class="grid-inputs">
+        <!-- СЛОТ 1 -->
+        <div class="input-box" id="box1"
+             ondragover="slotDragOver(event,1)" ondragleave="slotDragLeave(event,1)" ondrop="slotDrop(event,1)">
+            <div class="input-box-header">
+                <div class="slot-label-wrap">
+                    <span class="slot-label" id="label1" contenteditable="true" spellcheck="false"
+                          onblur="saveLabel(1)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">1. РУССКИЙ</span>
+                </div>
+                <div class="file-btns">
+                    <button class="btn-mini" onclick="document.getElementById('file1').click()">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(1)">✕</button>
+                    <input type="file" id="file1" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,1)">
+                </div>
+            </div>
+            <div class="drop-zone" id="dz1" onclick="document.getElementById('file1').click()">перетащите .txt или нажмите</div>
+            <textarea id="text1" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(1)"></textarea>
+            <div class="word-count" id="wc1">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge1">✅ файл загружен</div>
+        </div>
+
+        <!-- СЛОТ 2 -->
+        <div class="input-box" id="box2"
+             ondragover="slotDragOver(event,2)" ondragleave="slotDragLeave(event,2)" ondrop="slotDrop(event,2)">
+            <div class="input-box-header">
+                <div class="slot-label-wrap">
+                    <span class="slot-label" id="label2" contenteditable="true" spellcheck="false"
+                          onblur="saveLabel(2)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">2. ҚАЗАҚША</span>
+                </div>
+                <div class="file-btns">
+                    <button class="btn-mini" onclick="document.getElementById('file2').click()">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(2)">✕</button>
+                    <input type="file" id="file2" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,2)">
+                </div>
+            </div>
+            <div class="drop-zone" id="dz2" onclick="document.getElementById('file2').click()">перетащите .txt или нажмите</div>
+            <textarea id="text2" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(2)"></textarea>
+            <div class="word-count" id="wc2">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge2">✅ файл загружен</div>
+        </div>
+
+        <!-- СЛОТ 3 -->
+        <div class="input-box" id="box3"
+             ondragover="slotDragOver(event,3)" ondragleave="slotDragLeave(event,3)" ondrop="slotDrop(event,3)">
+            <div class="input-box-header">
+                <div class="slot-label-wrap">
+                    <span class="slot-label" id="label3" contenteditable="true" spellcheck="false"
+                          onblur="saveLabel(3)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">3. ENGLISH (исх.)</span>
+                </div>
+                <div class="file-btns">
+                    <button class="btn-mini" onclick="document.getElementById('file3').click()">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(3)">✕</button>
+                    <input type="file" id="file3" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,3)">
+                </div>
+            </div>
+            <div class="drop-zone" id="dz3" onclick="document.getElementById('file3').click()">перетащите .txt или нажмите</div>
+            <textarea id="text3" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(3)"></textarea>
+            <div class="word-count" id="wc3">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge3">✅ файл загружен</div>
+        </div>
+
+        <!-- СЛОТ 4 -->
+        <div class="input-box" id="box4"
+             ondragover="slotDragOver(event,4)" ondragleave="slotDragLeave(event,4)" ondrop="slotDrop(event,4)">
+            <div class="input-box-header">
+                <div class="slot-label-wrap">
+                    <span class="slot-label" id="label4" contenteditable="true" spellcheck="false"
+                          onblur="saveLabel(4)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">4. ENGLISH (авт.)</span>
+                </div>
+                <div class="file-btns">
+                    <button class="btn-mini" onclick="document.getElementById('file4').click()">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(4)">✕</button>
+                    <input type="file" id="file4" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,4)">
+                </div>
+            </div>
+            <div class="drop-zone" id="dz4" onclick="document.getElementById('file4').click()">перетащите .txt или нажмите</div>
+            <textarea id="text4" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(4)"></textarea>
+            <div class="word-count" id="wc4">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge4">✅ файл загружен</div>
+        </div>
+    </div>
+
+    <button class="analyze-btn" onclick="performAnalysis()">⟳ ВЫПОЛНИТЬ АНАЛИЗ ⟳</button>
+
+    <!-- РЕЗУЛЬТАТЫ -->
+    <div id="results" class="results-grid">
+        <div class="results-top">
+            <div class="chart-section">
+                <h3>🗿 ОППОЗИЦИОННЫЕ ТРАЕКТОРИИ</h3>
+                <svg id="radarSvg" class="radar-chart" viewBox="0 0 400 400"></svg>
+                <div class="legend-box">
+                    <span><span class="color-box cb-1"></span>русский</span>
+                    <span><span class="color-box cb-2"></span>қазақша</span>
+                    <span><span class="color-box cb-3"></span>EN исх.</span>
+                    <span><span class="color-box cb-4"></span>EN авт.</span>
+                </div>
+                <div id="shiftSummary" style="margin-top:15px; font-size:0.88rem; color:#2f1e0e;"></div>
+            </div>
+            <div class="metrics-section">
+                <h3>📊 ИНДЕКСЫ ОППОЗИЦИЙ</h3>
+                <p style="font-size:0.8rem; color:#4f351b; margin-bottom:8px;">0 = полностью полюс A · 1 = полностью полюс B</p>
+                <div id="metricsList"></div>
+                <div class="colloc-block" style="margin-top:15px;">
+                    <h4>🔗 КОЛЛОКАЦИИ ключевых слов</h4>
+                    <div id="collocContent" class="colloc-grid" style="margin-top:8px;">—</div>
+                </div>
+                <div class="comment-box" style="margin-top:15px;">
+                    <h4>✏️ ЭКСПЕРТНЫЙ КОММЕНТАРИЙ</h4>
+                    <textarea id="expertComment" placeholder="Ваши наблюдения по этому сеансу..."></textarea>
+                    <button class="btn" style="margin-top:8px;" onclick="saveComment()">💾 СОХРАНИТЬ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- СТРАТЕГИИ -->
+        <div class="strategy-panel">
+            <h3>🎯 DECONSTRUCTION ANALYZER STEPPE CODE</h3>
+            <p style="font-size:0.82rem; color:#4f351b; margin-bottom:15px;">Какие деколониальные стратегии представлены в каждой версии текста?</p>
+            <div class="strat-grid" id="stratGrid"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== ESCAPE ==========
+function escapeHtml(t) {
+    if (!t) return '';
+    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escapeJs(t) {
+    if (!t) return '';
+    return String(t).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+
+// ========== СЛОВАРЬ ==========
+const DEFAULT_DICT = {
+    "Nomadic vs Sedentary": {
+        A: ["nomad","steppe","horse","rider","yurt","herd","kumis","кочевник","степь","лошадь","юрта","табун","кумыс","көшпелі","дала","жылқы","ботай","botai","domestication","доместикация","приручение","кочевье","nomadic civilizations","nomadic societies","pastoralism","пастбище"],
+        B: ["sedentary","city","settlement","urban","mausoleum","agriculture","pyramid","оседлый","город","поселение","мавзолей","пирамида","отырықшы","қала","кесене","зиккурат","dwellings","settlements","қоныстар","village","поселок","necropolis","некрополь","қорым"]
+    },
+    "Civilization vs Barbarism": {
+        A: ["tribe","clan","indigenous","local","ancestor","племя","род","местный","предок","тайпа","ру","жергілікті","ата-баба","курган","петроглиф","warlord","primitive","barbaric","stealing","примитив","дикий","barbarism","варвар","so-called","allegedly"],
+        B: ["civilization","science","progress","structured","complex","цивилизация","наука","прогресс","развитие","өркениет","ғылым","даму","megalithic","monument","мегалитический","памятник","nobility","ақсүйектер","dynasty","dynasty","architectural masterpiece","outstanding","world history","emir","эмир","creator of a major power"]
+    },
+    "Ancient vs Modern": {
+        A: ["ancient","past","history","myth","ritual","древний","прошлое","история","ритуал","ежелгі","көне","тарих","рәсім","bronze age","iron age","neolithic","эпоха бронзы","неолит"],
+        B: ["modern","present","technology","study","analysis","современный","технология","исследование","анализ","қазіргі","заманауи","зерттеу","interdisciplinary","пәнаралық","museum","музей","reconstruction","реконструкция"]
+    },
+    "Nature vs Culture": {
+        A: ["nature","wild","animal","mountain","stone","природа","дикий","животное","гора","камень","табиғат","жабайы","жануар","тау","тас","steppe","степь"],
+        B: ["culture","art","craft","pottery","ornament","культура","искусство","ремесло","керамика","орнамент","мәдениет","өнер","қыш","өрнек","spiritual culture","духовная культура","rock chronicle","наскальная летопись","historical memory","исторической памяти","resource of historical memory"]
+    },
+    "East vs West (Orientalism)": {
+        A: ["east","orient","asia","восток","азия","шығыс","exotic","exotic","strange","mysterious","exoticization","экзотика","таинственный","чуждый","alien","foreign"],
+        B: ["west","euro","individual","rational","запад","евро","батыс","еуро","science","academy","academic","академический","UNESCO","world heritage","всемирное наследие","global","глобальный","international","международный"]
+    },
+    "Sacred vs Profane": {
+        A: ["grave","pit","burial","tomb","могила","захоронение","гробница","яма","so-called","alleged","allegedly","primitive drawing","рисунок","just a goat","humanoid","spaceship","comic","profan","бытовой","everyday","утилитарный"],
+        B: ["sacred","ritual","sanctuary","sacred object","ritual structure","necropolis complex","sacred monument","сакральный","ритуальное сооружение","сакральный объект","ritual significance","sacred drinks","haoma","хаома","spiritual","духовный","mythological","мифологический","киелі","ғұрыптық","salttyk"]
+    },
+    "Indigenous Agency vs Colonial Gaze": {
+        A: ["colonial","orientalist","western bias","colonialist","eurocentrism","европоцентризм","colonial gaze","западный взгляд","peripheral","периферийный","transit space","транзитное пространство","backward","отсталый","undeveloped","нецивилизованный"],
+        B: ["local historian","buketov university","satpayev","сатпаев","kazakh scientist","казахстанский ученый","our university","наш университет","national history","национальная история","kazakh archaeologist","domestic press","отечественная пресса","indigenous","автохтонный","local researcher","local science","primacy of kazakhstan","первенство казахстана","known all over the world","recognized expert","world scientific community"]
+    }
+};
+
+// ===== СТРАТЕГИИ (детектор) =====
+const STRATEGIES = {
+    "Upgrading / Ренационализация": {
+        color: "s1",
+        description: "Лексическое повышение: civilizations вм. tribes, settlements вм. camps, megalithic, necropolis complex, nobility, outstanding...",
+        words: ["civilization","civilizations","megalithic","monument","monuments","necropolis","complex","necropolis complex","nobility","mausoleum","settlements","dwellings","sacred monuments","archaeological site","spiritual culture","rock chronicle","высокий уровень","лексическое повышение","памятник","мегалитический","мавзолей","поселение","поселения","өркениет","ескерткіш","мегалитикалық","outstanding","creator of a major power","architectural masterpiece","emir","diplomatic","dynasty","world history","historical memory","resource of historical memory","ancient civilizations","nomadic civilizations"]
+    },
+    "Нейтрализация / Демистификация": {
+        color: "s2",
+        description: "Устранение криминализации и экзотизации: well-known personality, ritual significance, interdisciplinary study, sacred object...",
+        words: ["well-known personality","ritual","ritual significance","sacred object","interdisciplinary","ritual structure","religious","mystical","sacred","spiritual","нейтрализация","демистификация","прагматическая","ритуальный","сакральный","ритуальное","known personality","ritual fences","ritual purposes","not used for metallurgical","historical event","historical episode","calendar systems","origin of writing","mythological knowledge","peculiar texts","haoma","sacred drinks","outstanding commander"]
+    },
+    "Экспликация / Расширение": {
+        color: "s3",
+        description: "Сохранение и разворачивание реалий: balbals, kurgan with mustache, ukha, kumbha, Nauryz, ancient Turkic...",
+        words: ["balbals","balbal","балбал","kokterek","burial mound with a mustache","mustache","ancient turkic","ukha","kumbha","humb","haoma","nauryz","наурыз","indo-european","indoeuropean","vedic","vedic name","avestan","sanskrit","botai culture","taldy","taldinsky","buirekty","saka burials","saka","karsakpai","timur stone","stone slab","ulytau","betpakdala","zafar-name","book of victories","map of tartary","tartary","синтагматическое","экспликация","расширение","культурная реалия","топоним","транслитерация","burial mound","burial ground","neolithic settlement","open-air museum"]
+    }
+};
+
+// ========== LOCAL STORAGE ==========
+function getDict() {
+    try { return JSON.parse(localStorage.getItem('deconDictV2')) || DEFAULT_DICT; } catch { return DEFAULT_DICT; }
+}
+function saveDict(d) {
+    localStorage.setItem('deconDictV2', JSON.stringify(d));
+    renderDictLists();
+}
+function getHistory() {
+    try { return JSON.parse(localStorage.getItem('deconHistV2')) || []; } catch { return []; }
+}
+function saveHistory(h) { localStorage.setItem('deconHistV2', JSON.stringify(h)); }
+
+if (!localStorage.getItem('deconDictV2')) saveDict(DEFAULT_DICT);
+
+// ========== СЛОВАРЬ UI ==========
+function renderDictLists() {
+    const dict = getDict();
+    const c = document.getElementById('dictLists');
+    if (!c) return;
+    c.innerHTML = '';
+    for (let opp in dict) {
+        const col = document.createElement('div');
+        col.className = 'dict-col';
+        col.innerHTML = `<h4>${escapeHtml(opp)}</h4>`;
+        ['A','B'].forEach(pole => {
+            const sub = document.createElement('div');
+            sub.innerHTML = `<strong style="font-size:0.82rem; color:#4f351b;">${pole==='A'?'Полюс A (автохт./деколон.)':'Полюс B (запад./колон.)'}</strong>`;
+            const ul = document.createElement('ul');
+            ul.className = 'word-list';
+            dict[opp][pole].forEach((w, idx) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeWord('${escapeJs(opp)}','${pole}',${idx})">✕</button>`;
+                ul.appendChild(li);
+            });
+            sub.appendChild(ul);
+            col.appendChild(sub);
+        });
+        c.appendChild(col);
+    }
+}
+
+window.removeWord = function(opp, pole, idx) {
+    const d = getDict(); d[opp][pole].splice(idx,1); saveDict(d);
+};
+window.addWord = function() {
+    const w = document.getElementById('newWord').value.trim();
+    if (!w) return;
+    const opp = document.getElementById('newOpp').value;
+    const pole = document.getElementById('newPole').value;
+    const d = getDict();
+    if (!d[opp]) d[opp] = {A:[],B:[]};
+    d[opp][pole].push(w.toLowerCase());
+    saveDict(d);
+    document.getElementById('newWord').value = '';
+};
+
+// ========== СКАНИРОВАНИЕ ==========
+window.scanNewWords = function() {
+    let allText = '';
+    for (let i=1;i<=4;i++) allText += ' ' + (document.getElementById(`text${i}`).value || '');
+    const words = allText.toLowerCase().split(/[^a-zA-Zа-яА-ЯөқңғәүіұһӨҚҢҒӘҮІҰҺ]+/).filter(w=>w.length>3);
+    const dict = getDict();
+    const existing = new Set();
+    Object.values(dict).forEach(opp => { opp.A.forEach(w=>existing.add(w)); opp.B.forEach(w=>existing.add(w)); });
+    const newWords = [...new Set(words)].filter(w=>!existing.has(w) && w.length>3).sort().slice(0,60);
+    let html = `<p><strong>Новых слов найдено: ${newWords.length}</strong></p>`;
+    newWords.forEach(w => {
+        html += `<div class="scan-item"><span>${escapeHtml(w)}</span><button class="btn" style="padding:2px 10px;" onclick="quickAdd('${escapeJs(w)}')">➕ добавить</button></div>`;
+    });
+    document.getElementById('scanResults').innerHTML = html;
+};
+window.quickAdd = function(word) {
+    document.getElementById('newWord').value = word;
+    togglePanel('dictPanel');
+};
+
+// ========== АНАЛИЗ ТЕКСТА ==========
+function analyzeText(text) {
+    if (!text) return { data: [], avgShift: 0.5 };
+    const lc = text.toLowerCase();
+    const dict = getDict();
+    const keys = Object.keys(dict);
+    let totalShift = 0;
+    const results = keys.map(key => {
+        let countA=0, countB=0;
+        dict[key].A.forEach(w => { const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'); countA += (lc.match(re)||[]).length; });
+        dict[key].B.forEach(w => { const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'); countB += (lc.match(re)||[]).length; });
+        const total = countA+countB;
+        const index = total===0 ? 0.5 : countB/total;
+        totalShift += index;
+        return { key, index, countA, countB };
+    });
+    return { data: results, avgShift: totalShift/keys.length };
+}
+
+// ========== ДЕТЕКТОР СТРАТЕГИЙ ==========
+function detectStrategies(text) {
+    if (!text) return {};
+    const lc = text.toLowerCase();
+    const result = {};
+    for (let sName in STRATEGIES) {
+        const hits = [];
+        STRATEGIES[sName].words.forEach(w => {
+            const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+            const m = lc.match(re);
+            if (m && m.length > 0) hits.push(w + (m.length>1 ? ` ×${m.length}` : ''));
+        });
+        result[sName] = hits;
+    }
+    return result;
+}
+
+// ========== КОЛЛОКАЦИИ ==========
+function getCollocations(text, keywords, windowSize=3) {
+    if (!text) return [];
+    const words = text.toLowerCase().split(/[^a-zA-Zа-яА-ЯөқңғәүіұһӨҚҢҒӘҮІҰҺ]+/).filter(w=>w.length>2);
+    const coll = {};
+    keywords.forEach(kw => {
+        const kwParts = kw.split(/\s+/);
+        if (kwParts.length === 1) {
+            for (let i=0;i<words.length;i++) {
+                if (words[i]===kw) {
+                    for (let j=Math.max(0,i-windowSize);j<Math.min(words.length,i+windowSize+1);j++) {
+                        if (j!==i && words[j].length>2) { const key=`${kw} → ${words[j]}`; coll[key]=(coll[key]||0)+1; }
+                    }
+                }
+            }
+        }
+    });
+    return Object.entries(coll).sort((a,b)=>b[1]-a[1]).slice(0,15);
+}
+
+// ========== ОСНОВНОЙ АНАЛИЗ ==========
+function performAnalysis() {
+    const texts = [1,2,3,4].map(i => document.getElementById(`text${i}`).value);
+    if (texts.every(t=>!t.trim())) { alert('Введите хотя бы один текст'); return; }
+
+    const results = texts.map(t => analyzeText(t));
+    const strats = texts.map(t => detectStrategies(t));
+    const dict = getDict();
+    const keys = Object.keys(dict);
+
+    // --- МЕТРИКИ ---
+    let html = '';
+    const labels = ['Русский','Қазақша','EN исх.','EN авт.'];
+    const colors = ['cb-1','cb-2','cb-3','cb-4'];
+    keys.forEach((k,i) => {
+        html += `<div class="metric-title">${escapeHtml(k)}</div>`;
+        texts.forEach((t,ti) => {
+            if (!t.trim()) return;
+            const d = results[ti].data[i];
+            const idx = d.index;
+            let badge = '';
+            if (idx < 0.35) badge = `<span class="shift-badge shift-decolon">↑ деколон.</span>`;
+            else if (idx > 0.65) badge = `<span class="shift-badge shift-colonial">↓ колон.</span>`;
+            else badge = `<span class="shift-badge shift-neutral">≈ нейтр.</span>`;
+            html += `<div class="data-row"><span><span class="color-box ${colors[ti]}"></span>${labels[ti]}</span><span>${idx.toFixed(2)} (A:${d.countA} B:${d.countB})${badge}</span></div>`;
+        });
+    });
+    document.getElementById('metricsList').innerHTML = html;
+
+    // --- СДВИГ SUMMARY ---
+    let shiftHtml = '<strong>Средний деколониальный сдвиг:</strong><br>';
+    texts.forEach((t,ti) => {
+        if (!t.trim()) return;
+        const avg = results[ti].avgShift;
+        const dir = avg < 0.45 ? '⬆ деколониальный сдвиг' : avg > 0.55 ? '⬇ колониальный сдвиг' : '↔ нейтральный';
+        shiftHtml += `<span class="color-box ${colors[ti]}"></span> ${labels[ti]}: <b>${avg.toFixed(2)}</b> ${dir}<br>`;
+    });
+    if (texts[2].trim() && texts[3].trim()) {
+        const diff = results[2].avgShift - results[3].avgShift;
+        if (diff > 0.05) shiftHtml += `<br>✅ EN авт. сдвинут к деколониальному полюсу на <b>${diff.toFixed(2)}</b> относительно EN исх.`;
+        else if (diff < -0.05) shiftHtml += `<br>⚠️ EN авт. сдвинут к колониальному полюсу на <b>${Math.abs(diff).toFixed(2)}</b> относительно EN исх.`;
+        else shiftHtml += '<br>≈ EN авт. и EN исх. имеют схожий баланс.';
+    }
+    document.getElementById('shiftSummary').innerHTML = shiftHtml;
+
+    // --- ДЕТЕКТОР СТРАТЕГИЙ ---
+    const stratNames = Object.keys(STRATEGIES);
+    let stratHtml = '';
+    texts.forEach((t,ti) => {
+        if (!t.trim()) return;
+        const s = strats[ti];
+        const totals = stratNames.map(sn => s[sn] ? s[sn].length : 0);
+        const maxT = Math.max(...totals, 1);
+        stratHtml += `<div class="strat-card">
+            <h4><span class="color-box ${colors[ti]}"></span> ${labels[ti]}</h4>`;
+        stratNames.forEach((sn, si) => {
+            const hits = s[sn] || [];
+            const pct = Math.round((hits.length / maxT) * 100);
+            const barClass = STRATEGIES[sn].color;
+            stratHtml += `<div style="font-size:0.8rem; font-weight:bold; margin-top:8px;">${sn.split('/')[0].trim()} (${hits.length})</div>
+                <div class="strat-bar-wrap"><div class="strat-bar ${barClass}" style="width:${Math.min(pct,100)}%"></div></div>
+                <div class="strat-hits">${hits.slice(0,8).map(h=>`<span>${escapeHtml(h)}</span>`).join('')}${hits.length>8?`<span>+${hits.length-8}</span>`:''}</div>`;
+        });
+        stratHtml += '</div>';
+    });
+    document.getElementById('stratGrid').innerHTML = stratHtml;
+
+    // --- КОЛЛОКАЦИИ ---
+    const allKw = [];
+    Object.values(dict).forEach(opp => { allKw.push(...opp.A,...opp.B); });
+    const uniqueKw = [...new Set(allKw)];
+    let collHtml = '';
+    texts.forEach((t,ti) => {
+        if (!t.trim()) return;
+        const coll = getCollocations(t, uniqueKw);
+        collHtml += `<div><b>${labels[ti]}:</b><br>${coll.length ? coll.map(c=>`<span class="colloc-item">${escapeHtml(c[0])} (${c[1]})</span>`).join(' ') : '—'}</div>`;
+    });
+    document.getElementById('collocContent').innerHTML = collHtml || '—';
+
+    // --- РАДАР ---
+    drawRadar(keys, results.map(r=>r.data.map(d=>d.index)), texts.map(t=>!!t.trim()));
+
+    // --- СОХРАНИТЬ В ИСТОРИЮ ---
+    const history = getHistory();
+    const module = document.getElementById('corpusModule').value;
+    const ids = document.getElementById('corpusIds').value;
+    const sess = document.getElementById('sessionLabel').value || new Date().toLocaleString('ru');
+    history.unshift({
+        ts: new Date().toISOString(),
+        label: sess,
+        module: module,
+        ids: ids,
+        avgShifts: texts.map((t,ti) => t.trim() ? results[ti].avgShift.toFixed(2) : null),
+        comment: document.getElementById('expertComment').value
+    });
+    saveHistory(history.slice(0,30));
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+}
+
+// ========== РАДАР ==========
+function drawRadar(labels, datasets, active) {
+    const svg = document.getElementById('radarSvg');
+    svg.innerHTML = '';
+    const cx=200, cy=200, r=140;
+    const n = labels.length;
+    const step = (Math.PI*2)/n;
+    for (let i=1;i<=5;i++) svg.innerHTML += `<circle cx="${cx}" cy="${cy}" r="${r/5*i}" class="grid-circle"/>`;
+    for (let i=0;i<n;i++) {
+        const a = i*step - Math.PI/2;
+        const x2=cx+r*Math.cos(a), y2=cy+r*Math.sin(a);
+        svg.innerHTML += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" class="axis-line"/>`;
+        const lx=cx+(r+28)*Math.cos(a), ly=cy+(r+28)*Math.sin(a);
+        const shortLab = labels[i].split(' ')[0].slice(0,12);
+        svg.innerHTML += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" class="axis-label">${escapeHtml(shortLab)}</text>`;
+    }
+    const colors = [
+        {fill:'rgba(58,90,120,0.3)',stroke:'#2d4a6e'},
+        {fill:'rgba(70,120,70,0.3)',stroke:'#2d6e4a'},
+        {fill:'rgba(160,70,40,0.3)',stroke:'#9e4a2b'},
+        {fill:'rgba(180,140,30,0.3)',stroke:'#b47d30'}
+    ];
+    for (let d=0;d<4;d++) {
+        if (!active[d]) continue;
+        const pts = [];
+        for (let i=0;i<n;i++) {
+            const a=i*step-Math.PI/2;
+            const val = datasets[d][i] !== undefined ? datasets[d][i] : 0.5;
+            pts.push(`${cx+val*r*Math.cos(a)},${cy+val*r*Math.sin(a)}`);
+        }
+        svg.innerHTML += `<polygon points="${pts.join(' ')}" fill="${colors[d].fill}" stroke="${colors[d].stroke}" stroke-width="2.5"/>`;
+        pts.forEach(p => {
+            const [px,py] = p.split(',');
+            svg.innerHTML += `<circle cx="${px}" cy="${py}" r="4" fill="${colors[d].stroke}" stroke="#f0ddc0" stroke-width="1.5"/>`;
+        });
+    }
+}
+
+// ========== ИСТОРИЯ ==========
+function renderHistory() {
+    const h = getHistory();
+    const c = document.getElementById('historyList');
+    if (!h.length) { c.innerHTML = '<p>История пуста.</p>'; return; }
+    c.innerHTML = h.map(e => `<div class="history-entry">
+        <div class="he-meta">📂 ${escapeHtml(e.module||'—')} · ID: ${escapeHtml(e.ids||'—')} · ${escapeHtml(e.label)}</div>
+        <div class="he-scores">Сдвиги: ${(e.avgShifts||[]).map((s,i)=>s!==null?`[${['RU','KK','EN','EN↑'][i]}:${s}]`:'').filter(Boolean).join(' ')}</div>
+        ${e.comment ? `<div style="font-style:italic; font-size:0.82rem; margin-top:4px;">"${escapeHtml(e.comment)}"</div>` : ''}
+    </div>`).join('');
+}
+window.clearHistory = function() { saveHistory([]); renderHistory(); };
+
+// ========== ЭКСПОРТ ==========
+window.exportAll = function() {
+    const data = {
+        version: 2,
+        dictionary: getDict(),
+        history: getHistory(),
+        metrics: document.getElementById('metricsList')?.innerText || '',
+        collocations: document.getElementById('collocContent')?.innerText || '',
+        expertComment: document.getElementById('expertComment')?.value || '',
+        module: document.getElementById('corpusModule')?.value || '',
+        corpusIds: document.getElementById('corpusIds')?.value || '',
+        session: document.getElementById('sessionLabel')?.value || '',
+        timestamp: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `decon_v2_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+};
+
+// ========== ИМПОРТ (исправлено) ==========
+window.importDictionary = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const parsed = JSON.parse(ev.target.result);
+            // Поддержка как прямого словаря, так и экспорт-обёртки
+            const dict = parsed.dictionary || parsed;
+            if (typeof dict !== 'object' || Array.isArray(dict)) throw new Error('Неверный формат');
+            saveDict(dict);
+            if (parsed.history) saveHistory(parsed.history);
+            alert('Импорт завершён. Словарь и история обновлены.');
+        } catch(err) { alert('Ошибка: ' + err.message); }
+        e.target.value = '';
+    };
+    reader.readAsText(file);
+};
+
+// ========== ОСТАЛЬНОЕ ==========
+window.saveComment = function() { alert('Комментарий будет включён в экспорт.'); };
+window.clearAll = function() {
+    [1,2,3,4].forEach(i => {
+        document.getElementById(`text${i}`).value = '';
+        updateCount(i);
+        const b = document.getElementById(`badge${i}`);
+        if (b) b.style.display = 'none';
+    });
+    document.getElementById('corpusIds').value='';
+    document.getElementById('expertComment').value='';
+};
+window.togglePanel = function(id) {
+    const panels = ['loadPanel','dictPanel','scanPanel','histPanel'];
+    panels.forEach(pid => {
+        if (pid !== id) {
+            const p = document.getElementById(pid);
+            if (p) p.style.display = 'none';
+        }
+    });
+    const p = document.getElementById(id);
+    if (!p) return;
+    const isVisible = p.style.display !== 'none';
+    p.style.display = isVisible ? 'none' : 'block';
+    if (id==='dictPanel' && !isVisible) renderDictLists();
+    if (id==='histPanel' && !isVisible) renderHistory();
+};
+
+// ========== SLOT LABELS (editable, saved) ==========
+const DEFAULT_LABELS = ['1. РУССКИЙ', '2. ҚАЗАҚША', '3. ENGLISH (исх.)', '4. ENGLISH (авт.)'];
+function getLabels() {
+    try { return JSON.parse(localStorage.getItem('slotLabelsV2')) || [...DEFAULT_LABELS]; } catch { return [...DEFAULT_LABELS]; }
+}
+function saveLabel(n) {
+    const el = document.getElementById(`label${n}`);
+    const labels = getLabels();
+    labels[n-1] = el.textContent.trim() || DEFAULT_LABELS[n-1];
+    el.textContent = labels[n-1];
+    localStorage.setItem('slotLabelsV2', JSON.stringify(labels));
+}
+function restoreLabels() {
+    const labels = getLabels();
+    [1,2,3,4].forEach(n => {
+        const el = document.getElementById(`label${n}`);
+        if (el) el.textContent = labels[n-1];
+    });
+}
+
+// ========== WORD COUNT ==========
+function updateCount(n) {
+    const text = document.getElementById(`text${n}`).value;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const chars = text.length;
+    document.getElementById(`wc${n}`).textContent = `${words} слов · ${chars} симв.`;
+}
+
+// ========== CLEAR SLOT ==========
+window.clearSlot = function(n) {
+    document.getElementById(`text${n}`).value = '';
+    updateCount(n);
+    const badge = document.getElementById(`badge${n}`);
+    if (badge) badge.style.display = 'none';
+};
+
+// ========== READ FILE HELPER ==========
+function readTextFile(file, callback) {
+    if (!file) return;
+    // Only allow text-based files
+    const allowed = ['text/plain','text/markdown','text/csv','text/html','application/csv'];
+    const ext = file.name.split('.').pop().toLowerCase();
+    const allowedExts = ['txt','md','csv','log','html','htm'];
+    if (!allowedExts.includes(ext)) {
+        alert(`Файл "${file.name}" не поддерживается.\n\nПрограмма читает только текстовые файлы: .txt, .md, .csv\n\nДля PDF/DOCX: откройте файл → выделите весь текст (Ctrl+A) → скопируйте → вставьте в поле.`);
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) { callback(e.target.result, file.name); };
+    reader.onerror = function() { alert('Ошибка чтения файла. Убедитесь, что файл не повреждён и сохранён в UTF-8.'); };
+    reader.readAsText(file, 'UTF-8');
+}
+
+function putTextInSlot(text, filename, slotNum) {
+    document.getElementById(`text${slotNum}`).value = text;
+    updateCount(slotNum);
+    const badge = document.getElementById(`badge${slotNum}`);
+    if (badge) {
+        badge.textContent = `✅ ${filename} (${text.length} симв.)`;
+        badge.style.display = 'block';
+    }
+    // Auto-scroll to the slot
+    document.getElementById(`box${slotNum}`).scrollIntoView({ behavior:'smooth', block:'center' });
+    // Auto-scan if checkbox checked
+    if (document.getElementById('autoScanAfterLoad')?.checked) {
+        setTimeout(() => {
+            togglePanel('scanPanel');
+            scanNewWords();
+        }, 400);
+    }
+}
+
+// ========== PER-SLOT FILE INPUT ==========
+window.loadFileToSlot = function(event, slotNum) {
+    const file = event.target.files[0];
+    if (!file) return;
+    readTextFile(file, (text, name) => putTextInSlot(text, name, slotNum));
+    event.target.value = ''; // reset so same file can be reloaded
+};
+
+// ========== PER-SLOT DRAG & DROP ==========
+window.slotDragOver = function(event, n) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById(`dz${n}`).classList.add('drag-over');
+};
+window.slotDragLeave = function(event, n) {
+    document.getElementById(`dz${n}`).classList.remove('drag-over');
+};
+window.slotDrop = function(event, n) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById(`dz${n}`).classList.remove('drag-over');
+    const file = event.dataTransfer.files[0];
+    if (file) readTextFile(file, (text, name) => putTextInSlot(text, name, n));
+};
+
+// ========== GLOBAL DROP ZONE ==========
+window.globalDragOver = function(event) {
+    event.preventDefault();
+    document.getElementById('globalDrop').classList.add('drag-over');
+};
+window.globalDragLeave = function(event) {
+    document.getElementById('globalDrop').classList.remove('drag-over');
+};
+window.globalDrop = function(event) {
+    event.preventDefault();
+    document.getElementById('globalDrop').classList.remove('drag-over');
+    const file = event.dataTransfer.files[0];
+    if (!file) return;
+    const slot = parseInt(document.getElementById('globalTargetSlot').value);
+    readTextFile(file, (text, name) => putTextInSlot(text, name, slot));
+};
+window.globalFileChosen = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const slot = parseInt(document.getElementById('globalTargetSlot').value);
+    readTextFile(file, (text, name) => putTextInSlot(text, name, slot));
+    event.target.value = '';
+};
+
+// Make global drop zone clickable
+document.addEventListener('DOMContentLoaded', function() {
+    const gd = document.getElementById('globalDrop');
+    if (gd) {
+        gd.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'INPUT') {
+                document.getElementById('globalFileInput').click();
+            }
+        });
+    }
+});
+
+window.onload = function() {
+    renderDictLists();
+    restoreLabels();
+    [1,2,3,4].forEach(n => updateCount(n));
+};
+</script>
+    </div><!-- /.inner -->
+</div><!-- /.container -->
+</body>
+</html>
