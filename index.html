@@ -735,6 +735,37 @@ function escapeJs(t) {
     if (!t) return '';
     return String(t).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
 }
+function escapeAttr(t) {
+    // Дополнительное экранирование для вставки JS-литерала внутрь HTML-атрибута (onclick="...")
+    if (!t) return '';
+    return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ========== ГРАНИЦЫ СЛОВА (RU/KZ/EN) ==========
+// Обычный \b в JS regex построен на \w, который НЕ включает кириллицу — поэтому границы
+// считаем вручную, посимвольно, с явным алфавитом всех трёх языков корпуса.
+const WORD_CHARS = "A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі";
+const WORD_CHAR_RE = new RegExp(`[${WORD_CHARS}]`);
+function isWordChar(ch) { return !!ch && WORD_CHAR_RE.test(ch); }
+function countOccurrences(lowerText, phrase) {
+    const p = (phrase || '').toLowerCase();
+    if (!p) return 0;
+    let count = 0, pos = 0;
+    while (true) {
+        const idx = lowerText.indexOf(p, pos);
+        if (idx === -1) break;
+        const before = idx > 0 ? lowerText[idx - 1] : '';
+        const after = idx + p.length < lowerText.length ? lowerText[idx + p.length] : '';
+        if (!isWordChar(before) && !isWordChar(after)) count++;
+        pos = idx + p.length;
+    }
+    return count;
+}
+function tokenizeWords(text) {
+    // сохраняем апостроф внутри слова (aren't, it's), чтобы не резать сокращения на обрубки
+    const re = new RegExp(`[^${WORD_CHARS}'’-]+`, 'g');
+    return (text || '').replace(/[’‘]/g, "'").split(re).filter(Boolean);
+}
 
 // ========== СЛОВАРЬ ==========
 const DEFAULT_DICT = {
@@ -743,8 +774,8 @@ const DEFAULT_DICT = {
         B: ["sedentary","city","settlement","urban","mausoleum","agriculture","pyramid","оседлый","город","поселение","мавзолей","пирамида","отырықшы","қала","кесене","зиккурат","dwellings","settlements","қоныстар","village","поселок","necropolis","некрополь","қорым"]
     },
     "Civilization vs Barbarism": {
-        A: ["tribe","clan","indigenous","local","ancestor","племя","род","местный","предок","тайпа","ру","жергілікті","ата-баба","курган","петроглиф","warlord","primitive","barbaric","stealing","примитив","дикий","barbarism","варвар","so-called","allegedly"],
-        B: ["civilization","science","progress","structured","complex","цивилизация","наука","прогресс","развитие","өркениет","ғылым","даму","megalithic","monument","мегалитический","памятник","nobility","ақсүйектер","dynasty","dynasty","architectural masterpiece","outstanding","world history","emir","эмир","creator of a major power"]
+        A: ["tribe","clan","indigenous","local","ancestor","племя","род","местный","предок","тайпа","ру","жергілікті","ата-баба","курган","петроглиф"],
+        B: ["civilization","science","progress","structured","complex","цивилизация","наука","прогресс","развитие","өркениет","ғылым","даму","megalithic","monument","мегалитический","памятник","nobility","ақсүйектер","dynasty","dynasty","architectural masterpiece","outstanding","world history","emir","эмир","creator of a major power","warlord","primitive","barbaric","stealing","примитив","дикий","barbarism","варвар","so-called","allegedly"]
     },
     "Ancient vs Modern": {
         A: ["ancient","past","history","myth","ritual","древний","прошлое","история","ритуал","ежелгі","көне","тарих","рәсім","bronze age","iron age","neolithic","эпоха бронзы","неолит"],
@@ -755,16 +786,16 @@ const DEFAULT_DICT = {
         B: ["culture","art","craft","pottery","ornament","культура","искусство","ремесло","керамика","орнамент","мәдениет","өнер","қыш","өрнек","spiritual culture","духовная культура","rock chronicle","наскальная летопись","historical memory","исторической памяти","resource of historical memory"]
     },
     "East vs West (Orientalism)": {
-        A: ["east","orient","asia","восток","азия","шығыс","exotic","exotic","strange","mysterious","exoticization","экзотика","таинственный","чуждый","alien","foreign"],
-        B: ["west","euro","individual","rational","запад","евро","батыс","еуро","science","academy","academic","академический","UNESCO","world heritage","всемирное наследие","global","глобальный","international","международный"]
+        A: ["east","orient","asia","восток","азия","шығыс"],
+        B: ["west","euro","individual","rational","запад","евро","батыс","еуро","science","academy","academic","академический","UNESCO","world heritage","всемирное наследие","global","глобальный","international","международный","exotic","strange","mysterious","exoticization","экзотика","таинственный","чуждый","alien","foreign"]
     },
     "Sacred vs Profane": {
-        A: ["grave","pit","burial","tomb","могила","захоронение","гробница","яма","so-called","alleged","allegedly","primitive drawing","рисунок","just a goat","humanoid","spaceship","comic","profan","бытовой","everyday","утилитарный"],
-        B: ["sacred","ritual","sanctuary","sacred object","ritual structure","necropolis complex","sacred monument","сакральный","ритуальное сооружение","сакральный объект","ritual significance","sacred drinks","haoma","хаома","spiritual","духовный","mythological","мифологический","киелі","ғұрыптық","salttyk"]
+        A: ["sacred","ritual","sanctuary","sacred object","ritual structure","necropolis complex","sacred monument","сакральный","ритуальное сооружение","сакральный объект","ritual significance","sacred drinks","haoma","хаома","spiritual","духовный","mythological","мифологический","киелі","ғұрыптық","salttyk"],
+        B: ["grave","pit","burial","tomb","могила","захоронение","гробница","яма","so-called","alleged","allegedly","primitive drawing","рисунок","just a goat","humanoid","spaceship","comic","profan","бытовой","everyday","утилитарный"]
     },
     "Indigenous Agency vs Colonial Gaze": {
-        A: ["colonial","orientalist","western bias","colonialist","eurocentrism","европоцентризм","colonial gaze","западный взгляд","peripheral","периферийный","transit space","транзитное пространство","backward","отсталый","undeveloped","нецивилизованный"],
-        B: ["local historian","buketov university","satpayev","сатпаев","kazakh scientist","казахстанский ученый","our university","наш университет","national history","национальная история","kazakh archaeologist","domestic press","отечественная пресса","indigenous","автохтонный","local researcher","local science","primacy of kazakhstan","первенство казахстана","known all over the world","recognized expert","world scientific community"]
+        A: ["local historian","buketov university","satpayev","сатпаев","kazakh scientist","казахстанский ученый","our university","наш университет","national history","национальная история","kazakh archaeologist","domestic press","отечественная пресса","indigenous","автохтонный","local researcher","local science","primacy of kazakhstan","первенство казахстана","known all over the world","recognized expert","world scientific community"],
+        B: ["colonial","orientalist","western bias","colonialist","eurocentrism","европоцентризм","colonial gaze","западный взгляд","peripheral","периферийный","transit space","транзитное пространство","backward","отсталый","undeveloped","нецивилизованный"]
     }
 };
 
@@ -787,20 +818,36 @@ const STRATEGIES = {
     }
 };
 
+// ========== БЕЗОПАСНОЕ ХРАНИЛИЩЕ ==========
+// В некоторых песочницах (например, при просмотре как встроенный артефакт) обращение
+// к localStorage может выбросить исключение. Без этой обёртки это ломало ВСЮ программу:
+// скрипт останавливался на первой же строке инициализации словаря, и ни одна кнопка
+// (включая «ВЫПОЛНИТЬ АНАЛИЗ») не получала обработчик клика.
+let storageAvailable = true;
+const memoryStore = {};
+function safeGet(key) {
+    try { return localStorage.getItem(key); }
+    catch(e) { storageAvailable = false; return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null; }
+}
+function safeSet(key, value) {
+    try { localStorage.setItem(key, value); return true; }
+    catch(e) { storageAvailable = false; memoryStore[key] = value; return false; }
+}
+
 // ========== LOCAL STORAGE ==========
 function getDict() {
-    try { return JSON.parse(localStorage.getItem('deconDictV2')) || DEFAULT_DICT; } catch { return DEFAULT_DICT; }
+    try { return JSON.parse(safeGet('deconDictV2')) || DEFAULT_DICT; } catch { return DEFAULT_DICT; }
 }
 function saveDict(d) {
-    localStorage.setItem('deconDictV2', JSON.stringify(d));
+    safeSet('deconDictV2', JSON.stringify(d));
     renderDictLists();
 }
 function getHistory() {
-    try { return JSON.parse(localStorage.getItem('deconHistV2')) || []; } catch { return []; }
+    try { return JSON.parse(safeGet('deconHistV2')) || []; } catch { return []; }
 }
-function saveHistory(h) { localStorage.setItem('deconHistV2', JSON.stringify(h)); }
+function saveHistory(h) { safeSet('deconHistV2', JSON.stringify(h)); }
 
-if (!localStorage.getItem('deconDictV2')) saveDict(DEFAULT_DICT);
+if (!safeGet('deconDictV2')) saveDict(DEFAULT_DICT);
 
 // ========== СЛОВАРЬ UI ==========
 function renderDictLists() {
@@ -819,7 +866,7 @@ function renderDictLists() {
             ul.className = 'word-list';
             dict[opp][pole].forEach((w, idx) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeWord('${escapeJs(opp)}','${pole}',${idx})">✕</button>`;
+                li.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeWord('${escapeAttr(escapeJs(opp))}','${pole}',${idx})">✕</button>`;
                 ul.appendChild(li);
             });
             sub.appendChild(ul);
@@ -848,14 +895,14 @@ window.addWord = function() {
 window.scanNewWords = function() {
     let allText = '';
     for (let i=1;i<=4;i++) allText += ' ' + (document.getElementById(`text${i}`).value || '');
-    const words = allText.toLowerCase().split(/[^a-zA-Zа-яА-ЯөқңғәүіұһӨҚҢҒӘҮІҰҺ]+/).filter(w=>w.length>3);
+    const words = tokenizeWords(allText.toLowerCase()).filter(w=>w.length>3);
     const dict = getDict();
     const existing = new Set();
     Object.values(dict).forEach(opp => { opp.A.forEach(w=>existing.add(w)); opp.B.forEach(w=>existing.add(w)); });
     const newWords = [...new Set(words)].filter(w=>!existing.has(w) && w.length>3).sort().slice(0,60);
     let html = `<p><strong>Новых слов найдено: ${newWords.length}</strong></p>`;
     newWords.forEach(w => {
-        html += `<div class="scan-item"><span>${escapeHtml(w)}</span><button class="btn" style="padding:2px 10px;" onclick="quickAdd('${escapeJs(w)}')">➕ добавить</button></div>`;
+        html += `<div class="scan-item"><span>${escapeHtml(w)}</span><button class="btn" style="padding:2px 10px;" onclick="quickAdd('${escapeAttr(escapeJs(w))}')">➕ добавить</button></div>`;
     });
     document.getElementById('scanResults').innerHTML = html;
 };
@@ -873,8 +920,8 @@ function analyzeText(text) {
     let totalShift = 0;
     const results = keys.map(key => {
         let countA=0, countB=0;
-        dict[key].A.forEach(w => { const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'); countA += (lc.match(re)||[]).length; });
-        dict[key].B.forEach(w => { const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'); countB += (lc.match(re)||[]).length; });
+        dict[key].A.forEach(w => { countA += countOccurrences(lc, w); });
+        dict[key].B.forEach(w => { countB += countOccurrences(lc, w); });
         const total = countA+countB;
         const index = total===0 ? 0.5 : countB/total;
         totalShift += index;
@@ -891,9 +938,8 @@ function detectStrategies(text) {
     for (let sName in STRATEGIES) {
         const hits = [];
         STRATEGIES[sName].words.forEach(w => {
-            const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-            const m = lc.match(re);
-            if (m && m.length > 0) hits.push(w + (m.length>1 ? ` ×${m.length}` : ''));
+            const n = countOccurrences(lc, w);
+            if (n > 0) hits.push(w + (n>1 ? ` ×${n}` : ''));
         });
         result[sName] = hits;
     }
@@ -903,7 +949,7 @@ function detectStrategies(text) {
 // ========== КОЛЛОКАЦИИ ==========
 function getCollocations(text, keywords, windowSize=3) {
     if (!text) return [];
-    const words = text.toLowerCase().split(/[^a-zA-Zа-яА-ЯөқңғәүіұһӨҚҢҒӘҮІҰҺ]+/).filter(w=>w.length>2);
+    const words = tokenizeWords(text.toLowerCase()).filter(w=>w.length>2);
     const coll = {};
     keywords.forEach(kw => {
         const kwParts = kw.split(/\s+/);
@@ -1034,7 +1080,8 @@ function drawRadar(labels, datasets, active) {
         const x2=cx+r*Math.cos(a), y2=cy+r*Math.sin(a);
         svg.innerHTML += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" class="axis-line"/>`;
         const lx=cx+(r+28)*Math.cos(a), ly=cy+(r+28)*Math.sin(a);
-        const shortLab = labels[i].split(' ')[0].slice(0,12);
+        let shortLab = labels[i].split('(')[0].trim().replace(/\s+vs\.?\s+/i, ' / ');
+        if (shortLab.length > 22) shortLab = shortLab.slice(0,20) + '…';
         svg.innerHTML += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" class="axis-label">${escapeHtml(shortLab)}</text>`;
     }
     const colors = [
@@ -1102,10 +1149,19 @@ window.importDictionary = function(e) {
         try {
             const parsed = JSON.parse(ev.target.result);
             // Поддержка как прямого словаря, так и экспорт-обёртки
-            const dict = parsed.dictionary || parsed;
-            if (typeof dict !== 'object' || Array.isArray(dict)) throw new Error('Неверный формат');
+            const rawDict = parsed.dictionary || parsed;
+            if (typeof rawDict !== 'object' || Array.isArray(rawDict)) throw new Error('Неверный формат');
+            // нормализуем каждую ось, чтобы отсутствующие/повреждённые A или B не роняли анализ позже
+            const dict = {};
+            Object.keys(rawDict).forEach(key => {
+                const axis = rawDict[key] || {};
+                dict[key] = {
+                    A: Array.isArray(axis.A) ? axis.A.map(String) : [],
+                    B: Array.isArray(axis.B) ? axis.B.map(String) : []
+                };
+            });
             saveDict(dict);
-            if (parsed.history) saveHistory(parsed.history);
+            if (parsed.history && Array.isArray(parsed.history)) saveHistory(parsed.history);
             alert('Импорт завершён. Словарь и история обновлены.');
         } catch(err) { alert('Ошибка: ' + err.message); }
         e.target.value = '';
@@ -1144,14 +1200,14 @@ window.togglePanel = function(id) {
 // ========== SLOT LABELS (editable, saved) ==========
 const DEFAULT_LABELS = ['1. РУССКИЙ', '2. ҚАЗАҚША', '3. ENGLISH (исх.)', '4. ENGLISH (авт.)'];
 function getLabels() {
-    try { return JSON.parse(localStorage.getItem('slotLabelsV2')) || [...DEFAULT_LABELS]; } catch { return [...DEFAULT_LABELS]; }
+    try { return JSON.parse(safeGet('slotLabelsV2')) || [...DEFAULT_LABELS]; } catch { return [...DEFAULT_LABELS]; }
 }
 function saveLabel(n) {
     const el = document.getElementById(`label${n}`);
     const labels = getLabels();
     labels[n-1] = el.textContent.trim() || DEFAULT_LABELS[n-1];
     el.textContent = labels[n-1];
-    localStorage.setItem('slotLabelsV2', JSON.stringify(labels));
+    safeSet('slotLabelsV2', JSON.stringify(labels));
 }
 function restoreLabels() {
     const labels = getLabels();
@@ -1278,6 +1334,12 @@ window.onload = function() {
     renderDictLists();
     restoreLabels();
     [1,2,3,4].forEach(n => updateCount(n));
+    if (!storageAvailable) {
+        const notice = document.createElement('div');
+        notice.style.cssText = 'max-width:1520px;margin:0 auto 10px;padding:8px 16px;background:#3a1a10;color:#f4c8a8;border:1px solid var(--terra);border-radius:2px;font-size:0.8rem;text-align:center;';
+        notice.textContent = '⚠ Хранилище браузера недоступно в этом окне — словарь, история и подписи слотов будут работать только в течение текущей сессии и не сохранятся после перезагрузки страницы. Сам анализ и экспорт при этом работают без ограничений.';
+        document.body.insertBefore(notice, document.body.firstChild);
+    }
 };
 </script>
     </div><!-- /.inner -->
