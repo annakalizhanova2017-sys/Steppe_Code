@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deconstruction Analyzer Steppe Code</title>
+    <title>Steppe Code: Deconstruction Analyzer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -64,6 +64,17 @@
             position: relative;
             overflow: hidden;
         }
+        .lang-switch{
+            position:absolute; top:14px; right:18px; z-index:3;
+            display:flex; border:1px solid var(--gold-line); border-radius:2px; overflow:hidden;
+        }
+        .lang-btn{
+            font-family:'Source Sans 3', sans-serif; font-size:11px; font-weight:700; letter-spacing:.05em;
+            padding:5px 11px; border:none; background:#1c1408; color:var(--gold-mid); cursor:pointer;
+        }
+        .lang-btn + .lang-btn{ border-left:1px solid var(--gold-line); }
+        .lang-btn.active{ background:var(--gold-hi); color:#1c1408; }
+        .lang-btn:hover:not(.active){ color:var(--gold-hi); }
         .site-header::before {
             content: '';
             position: absolute;
@@ -491,85 +502,95 @@
 <div class="container">
     <!-- HEADER -->
     <div class="site-header">
-        <h1>Deconstruction Analyzer Steppe Code</h1>
+        <div class="lang-switch no-print">
+            <button class="lang-btn active" data-lang="ru" onclick="setLang('ru')">RU</button>
+            <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        </div>
+        <h1 data-i18n="a1">Steppe Code: Deconstruction Analyzer</h1>
         <div class="header-line"></div>
-        <div class="header-tagline">повышение · нейтрализация · экспликация · агентизация · деколониальный анализ дискурса</div>
+        <div class="header-tagline" data-i18n="a61">повышение · нейтрализация · экспликация · агентизация · деколониальный анализ дискурса</div>
     </div>
 
     <div class="inner">
 
     <div class="button-row">
-        <button class="btn" onclick="togglePanel('loadPanel')">📂 ЗАГРУЗИТЬ ФАЙЛ</button>
-        <button class="btn" onclick="togglePanel('dictPanel')">📚 СЛОВАРЬ</button>
-        <button class="btn" onclick="togglePanel('scanPanel')">🔍 НОВЫЕ СЛОВА</button>
-        <button class="btn" onclick="togglePanel('histPanel')">🕰 ИСТОРИЯ АНАЛИЗОВ</button>
-        <button class="btn" onclick="exportAll()">📥 ЭКСПОРТ (JSON)</button>
-        <button class="btn" onclick="document.getElementById('importFile').click()">📤 ИМПОРТ</button>
+        <button class="btn" onclick="togglePanel('loadPanel')" data-i18n="a42">📂 ЗАГРУЗИТЬ ФАЙЛ</button>
+        <button class="btn" onclick="togglePanel('dictPanel')" data-i18n="a43">📚 СЛОВАРЬ</button>
+        <button class="btn" onclick="togglePanel('scanPanel')" data-i18n="a44">🔍 НОВЫЕ СЛОВА</button>
+        <button class="btn" onclick="togglePanel('histPanel')" data-i18n="a45">🕰 ИСТОРИЯ АНАЛИЗОВ</button>
+        <button class="btn" onclick="exportAll()" data-i18n="a46">📥 ЭКСПОРТ (JSON)</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()" data-i18n="a47">📤 ИМПОРТ</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importDictionary(event)">
-        <button class="btn" onclick="clearAll()">🗑 ОЧИСТИТЬ ПОЛЯ</button>
+        <button class="btn" onclick="clearAll()" data-i18n="a48">🗑 ОЧИСТИТЬ ПОЛЯ</button>
     </div>
 
     <!-- MODULE ROW -->
     <div class="module-row">
-        <label>📂 Модуль корпуса:</label>
+        <label data-i18n="a13">📂 Модуль корпуса:</label>
         <select id="corpusModule">
-            <option value="">— выберите —</option>
-            <option value="Pyramid Karazhartas">Пирамида Каражартас (K-xx)</option>
-            <option value="Saryarka Petroglyphs">Петроглифы Сарыарки (P-xx)</option>
-            <option value="Botai Culture">Ботайская культура (B-xx)</option>
-            <option value="Timur Stone">Камень Тимура (T-xx)</option>
-            <option value="Bronze Age Ceramics">Керамика бронзового века (C-xx)</option>
-            <option value="Multi-module">Несколько модулей</option>
+            <option value="" data-i18n="a17">— выберите —</option>
+            <option value="Pyramid Karazhartas" data-i18n="a18">Пирамида Каражартас (K-xx)</option>
+            <option value="Saryarka Petroglyphs" data-i18n="a19">Петроглифы Сарыарки (P-xx)</option>
+            <option value="Botai Culture" data-i18n="a20">Ботайская культура (B-xx)</option>
+            <option value="Timur Stone" data-i18n="a21">Камень Тимура (T-xx)</option>
+            <option value="Bronze Age Ceramics" data-i18n="a22">Керамика бронзового века (C-xx)</option>
+            <option value="Multi-module" data-i18n="a23">Несколько модулей</option>
         </select>
-        <label>ID строк:</label>
-        <input type="text" id="corpusIds" placeholder="K-02, K-04, K-17..." style="width:200px;">
-        <label>Сессия:</label>
-        <input type="text" id="sessionLabel" placeholder="сессия / дата" style="width:150px;">
+        <label data-i18n="a14">ID строк:</label>
+        <input type="text" id="corpusIds" placeholder="K-02, K-04, K-17..." data-i18n-ph="a67" style="width:200px;">
+        <label data-i18n="a15">Сессия:</label>
+        <input type="text" id="sessionLabel" placeholder="сессия / дата" data-i18n-ph="a68" style="width:150px;">
+        <label data-i18n="a208">Вектор:</label>
+        <select id="translationVector">
+            <option value="" data-i18n="a209">— не указан —</option>
+            <option value="reception" data-i18n="a210">Рецепция (EN → RU)</option>
+            <option value="export" data-i18n="a211">Экспорт (RU/KZ → EN)</option>
+        </select>
     </div>
 
     <!-- СЛОВАРЬ -->
     <div id="dictPanel" class="panel" style="display:none;">
-        <h3>📖 РЕДАКТОР БИНАРНЫХ ОППОЗИЦИЙ</h3>
+        <h3 data-i18n="a2">📖 РЕДАКТОР БИНАРНЫХ ОППОЗИЦИЙ</h3>
         <div class="dict-cols" id="dictLists"></div>
         <div class="add-word-form">
-            <h4>➕ ДОБАВИТЬ СЛОВО / PHRASE</h4>
-            <input type="text" id="newWord" placeholder="слово или словосочетание">
+            <h4 data-i18n="a9">➕ ДОБАВИТЬ СЛОВО / PHRASE</h4>
+            <input type="text" id="newWord" placeholder="слово или словосочетание" data-i18n-ph="a69">
             <select id="newOpp">
-                <option value="Nomadic vs Sedentary">Nomadic vs Sedentary</option>
-                <option value="Civilization vs Barbarism">Civilization vs Barbarism</option>
-                <option value="Ancient vs Modern">Ancient vs Modern</option>
-                <option value="Nature vs Culture">Nature vs Culture</option>
-                <option value="East vs West (Orientalism)">East vs West (Orientalism)</option>
-                <option value="Sacred vs Profane">Sacred vs Profane ★ нов.</option>
-                <option value="Indigenous Agency vs Colonial Gaze">Indigenous Agency vs Colonial Gaze ★ нов.</option>
+                <option value="Nomadic vs Sedentary" data-i18n="a24">Nomadic vs Sedentary</option>
+                <option value="Civilization vs Barbarism" data-i18n="a25">Civilization vs Barbarism</option>
+                <option value="Ancient vs Modern" data-i18n="a26">Ancient vs Modern</option>
+                <option value="Nature vs Culture" data-i18n="a27">Nature vs Culture</option>
+                <option value="East vs West (Orientalism)" data-i18n="a28">East vs West (Orientalism)</option>
+                <option value="Sacred vs Profane" data-i18n="a29">Sacred vs Profane ★ нов.</option>
+                <option value="Indigenous Agency vs Colonial Gaze" data-i18n="a30">Indigenous Agency vs Colonial Gaze ★ нов.</option>
             </select>
             <select id="newPole">
-                <option value="A">Полюс A (кочевой/автохтонный/сакральный/деколониальный)</option>
-                <option value="B">Полюс B (оседлый/западный/профанный/колониальный)</option>
+                <option value="A" data-i18n="a31">Полюс A (кочевой/автохтонный/сакральный/деколониальный)</option>
+                <option value="B" data-i18n="a32">Полюс B (оседлый/западный/профанный/колониальный)</option>
             </select>
-            <button class="btn" onclick="addWord()">ДОБАВИТЬ</button>
+            <button class="btn" onclick="addWord()" data-i18n="a49">ДОБАВИТЬ</button>
         </div>
     </div>
 
     <!-- СКАНИРОВАНИЕ -->
     <div id="scanPanel" class="panel" style="display:none;">
-        <h3>🔎 АВТОМАТИЧЕСКОЕ ПОПОЛНЕНИЕ СЛОВАРЯ</h3>
-        <p style="margin-bottom:10px; font-size:0.9rem;">Вставьте тексты в поля ввода, затем нажмите кнопку. Программа покажет слова, которых ещё нет в словаре.</p>
-        <button class="btn" onclick="scanNewWords()">🔎 НАЙТИ НОВЫЕ СЛОВА</button>
+        <h3 data-i18n="a3">🔎 АВТОМАТИЧЕСКОЕ ПОПОЛНЕНИЕ СЛОВАРЯ</h3>
+        <p style="margin-bottom:10px; font-size:0.9rem;" data-i18n="a62">Вставьте тексты в поля ввода, затем нажмите кнопку. Программа покажет слова, которых ещё нет в словаре.</p>
+        <button class="btn" onclick="scanNewWords()" data-i18n="a50">🔎 НАЙТИ НОВЫЕ СЛОВА</button>
         <div id="scanResults" style="margin-top:15px;"></div>
     </div>
 
     <!-- ИСТОРИЯ -->
     <div id="histPanel" class="panel" style="display:none;">
-        <h3>🕰 ИСТОРИЯ АНАЛИЗОВ</h3>
-        <button class="btn" onclick="clearHistory()" style="margin-bottom:10px;">🗑 Очистить историю</button>
+        <h3 data-i18n="a4">🕰 ИСТОРИЯ АНАЛИЗОВ</h3>
+        <button class="btn" onclick="clearHistory()" style="margin-bottom:10px;" data-i18n="a51">🗑 Очистить историю</button>
         <div id="historyList"></div>
     </div>
 
     <!-- ПАНЕЛЬ ЗАГРУЗКИ ФАЙЛОВ -->
     <div id="loadPanel" class="load-panel" style="display:none;">
-        <h3>📂 ЗАГРУЗИТЬ ТЕКСТОВЫЙ ФАЙЛ</h3>
-        <p>Перетащите файл в любое поле ниже или выберите файл и укажите, в какой слот его загрузить. Названия слотов можно переименовать — кликните прямо на заголовок поля.</p>
+        <h3 data-i18n="a5">📂 ЗАГРУЗИТЬ ТЕКСТОВЫЙ ФАЙЛ</h3>
+        <p data-i18n="a63">Перетащите файл в любое поле ниже или выберите файл и укажите, в какой слот его загрузить. Названия слотов можно переименовать — кликните прямо на заголовок поля.</p>
 
         <div class="global-drop" id="globalDrop"
              ondragover="globalDragOver(event)"
@@ -580,22 +601,22 @@
         </div>
 
         <div class="load-controls">
-            <label>Загрузить в слот:</label>
+            <label data-i18n="a16">Загрузить в слот:</label>
             <select id="globalTargetSlot">
-                <option value="1">Слот 1</option>
-                <option value="2">Слот 2</option>
-                <option value="3">Слот 3</option>
-                <option value="4">Слот 4</option>
+                <option value="1" data-i18n="a33">Слот 1</option>
+                <option value="2" data-i18n="a34">Слот 2</option>
+                <option value="3" data-i18n="a35">Слот 3</option>
+                <option value="4" data-i18n="a36">Слот 4</option>
             </select>
             <label>
                 <input type="checkbox" id="autoScanAfterLoad" checked>
-                Автоматически открыть сканер слов после загрузки
-            </label>
+                <span data-i18n="a75">Автоматически открыть сканер слов после загрузки
+            </span></label>
         </div>
 
         <div class="load-note">
-            ⚠️ <strong>Поддерживаемые форматы: .txt, .md, .csv</strong> — любые текстовые файлы в кодировке UTF-8.<br>
-            Файлы <strong>.pdf, .docx, .doc</strong> браузер читать напрямую не может — это ограничение технологии, а не программы.
+            ⚠️ <strong data-i18n="a37">Поддерживаемые форматы: .txt, .md, .csv</strong> — любые текстовые файлы в кодировке UTF-8.<br>
+            Файлы <strong data-i18n="a38">.pdf, .docx, .doc</strong> браузер читать напрямую не может — это ограничение технологии, а не программы.
             Чтобы загрузить PDF или Word: откройте файл → выделите весь текст (Ctrl+A) → скопируйте → вставьте в поле вручную.
             Или сохраните документ как .txt через «Сохранить как...» в Word / «Экспорт в текст» в Acrobat.
         </div>
@@ -609,18 +630,18 @@
             <div class="input-box-header">
                 <div class="slot-label-wrap">
                     <span class="slot-label" id="label1" contenteditable="true" spellcheck="false"
-                          onblur="saveLabel(1)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">1. РУССКИЙ</span>
+                          onblur="saveLabel(1)" onkeydown="if(event.key==='Enter'){this.blur();return false;}" data-i18n="a80">1. РУССКИЙ</span>
                 </div>
                 <div class="file-btns">
-                    <button class="btn-mini" onclick="document.getElementById('file1').click()">📄 .txt</button>
-                    <button class="btn-mini danger" onclick="clearSlot(1)">✕</button>
+                    <button class="btn-mini" onclick="document.getElementById('file1').click()" data-i18n="a52">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(1)" data-i18n="a53">✕</button>
                     <input type="file" id="file1" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,1)">
                 </div>
             </div>
-            <div class="drop-zone" id="dz1" onclick="document.getElementById('file1').click()">перетащите .txt или нажмите</div>
-            <textarea id="text1" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(1)"></textarea>
-            <div class="word-count" id="wc1">0 слов · 0 симв.</div>
-            <div class="file-loaded-badge" id="badge1">✅ файл загружен</div>
+            <div class="drop-zone" id="dz1" onclick="document.getElementById('file1').click()" data-i18n="a76">перетащите .txt или нажмите</div>
+            <textarea id="text1" placeholder="Вставьте любой текст или загрузите .txt файл..." data-i18n-ph="a70" oninput="updateCount(1)"></textarea>
+            <div class="word-count" id="wc1" data-i18n="a77">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge1" data-i18n="a78">✅ файл загружен</div>
         </div>
 
         <!-- СЛОТ 2 -->
@@ -629,18 +650,18 @@
             <div class="input-box-header">
                 <div class="slot-label-wrap">
                     <span class="slot-label" id="label2" contenteditable="true" spellcheck="false"
-                          onblur="saveLabel(2)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">2. ҚАЗАҚША</span>
+                          onblur="saveLabel(2)" onkeydown="if(event.key==='Enter'){this.blur();return false;}" data-i18n="a81">2. ҚАЗАҚША</span>
                 </div>
                 <div class="file-btns">
-                    <button class="btn-mini" onclick="document.getElementById('file2').click()">📄 .txt</button>
-                    <button class="btn-mini danger" onclick="clearSlot(2)">✕</button>
+                    <button class="btn-mini" onclick="document.getElementById('file2').click()" data-i18n="a54">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(2)" data-i18n="a55">✕</button>
                     <input type="file" id="file2" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,2)">
                 </div>
             </div>
-            <div class="drop-zone" id="dz2" onclick="document.getElementById('file2').click()">перетащите .txt или нажмите</div>
-            <textarea id="text2" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(2)"></textarea>
-            <div class="word-count" id="wc2">0 слов · 0 симв.</div>
-            <div class="file-loaded-badge" id="badge2">✅ файл загружен</div>
+            <div class="drop-zone" id="dz2" onclick="document.getElementById('file2').click()" data-i18n="a76">перетащите .txt или нажмите</div>
+            <textarea id="text2" placeholder="Вставьте любой текст или загрузите .txt файл..." data-i18n-ph="a71" oninput="updateCount(2)"></textarea>
+            <div class="word-count" id="wc2" data-i18n="a77">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge2" data-i18n="a78">✅ файл загружен</div>
         </div>
 
         <!-- СЛОТ 3 -->
@@ -649,18 +670,18 @@
             <div class="input-box-header">
                 <div class="slot-label-wrap">
                     <span class="slot-label" id="label3" contenteditable="true" spellcheck="false"
-                          onblur="saveLabel(3)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">3. ENGLISH (исх.)</span>
+                          onblur="saveLabel(3)" onkeydown="if(event.key==='Enter'){this.blur();return false;}" data-i18n="a82">3. ENGLISH (исх.)</span>
                 </div>
                 <div class="file-btns">
-                    <button class="btn-mini" onclick="document.getElementById('file3').click()">📄 .txt</button>
-                    <button class="btn-mini danger" onclick="clearSlot(3)">✕</button>
+                    <button class="btn-mini" onclick="document.getElementById('file3').click()" data-i18n="a56">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(3)" data-i18n="a57">✕</button>
                     <input type="file" id="file3" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,3)">
                 </div>
             </div>
-            <div class="drop-zone" id="dz3" onclick="document.getElementById('file3').click()">перетащите .txt или нажмите</div>
-            <textarea id="text3" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(3)"></textarea>
-            <div class="word-count" id="wc3">0 слов · 0 симв.</div>
-            <div class="file-loaded-badge" id="badge3">✅ файл загружен</div>
+            <div class="drop-zone" id="dz3" onclick="document.getElementById('file3').click()" data-i18n="a76">перетащите .txt или нажмите</div>
+            <textarea id="text3" placeholder="Вставьте любой текст или загрузите .txt файл..." data-i18n-ph="a72" oninput="updateCount(3)"></textarea>
+            <div class="word-count" id="wc3" data-i18n="a77">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge3" data-i18n="a78">✅ файл загружен</div>
         </div>
 
         <!-- СЛОТ 4 -->
@@ -669,57 +690,57 @@
             <div class="input-box-header">
                 <div class="slot-label-wrap">
                     <span class="slot-label" id="label4" contenteditable="true" spellcheck="false"
-                          onblur="saveLabel(4)" onkeydown="if(event.key==='Enter'){this.blur();return false;}">4. ENGLISH (авт.)</span>
+                          onblur="saveLabel(4)" onkeydown="if(event.key==='Enter'){this.blur();return false;}" data-i18n="a83">4. ENGLISH (авт.)</span>
                 </div>
                 <div class="file-btns">
-                    <button class="btn-mini" onclick="document.getElementById('file4').click()">📄 .txt</button>
-                    <button class="btn-mini danger" onclick="clearSlot(4)">✕</button>
+                    <button class="btn-mini" onclick="document.getElementById('file4').click()" data-i18n="a58">📄 .txt</button>
+                    <button class="btn-mini danger" onclick="clearSlot(4)" data-i18n="a59">✕</button>
                     <input type="file" id="file4" accept=".txt,.md,.csv" style="display:none" onchange="loadFileToSlot(event,4)">
                 </div>
             </div>
-            <div class="drop-zone" id="dz4" onclick="document.getElementById('file4').click()">перетащите .txt или нажмите</div>
-            <textarea id="text4" placeholder="Вставьте любой текст или загрузите .txt файл..." oninput="updateCount(4)"></textarea>
-            <div class="word-count" id="wc4">0 слов · 0 симв.</div>
-            <div class="file-loaded-badge" id="badge4">✅ файл загружен</div>
+            <div class="drop-zone" id="dz4" onclick="document.getElementById('file4').click()" data-i18n="a76">перетащите .txt или нажмите</div>
+            <textarea id="text4" placeholder="Вставьте любой текст или загрузите .txt файл..." data-i18n-ph="a73" oninput="updateCount(4)"></textarea>
+            <div class="word-count" id="wc4" data-i18n="a77">0 слов · 0 симв.</div>
+            <div class="file-loaded-badge" id="badge4" data-i18n="a78">✅ файл загружен</div>
         </div>
     </div>
 
-    <button class="analyze-btn" onclick="performAnalysis()">⟳ ВЫПОЛНИТЬ АНАЛИЗ ⟳</button>
+    <button class="analyze-btn" onclick="performAnalysis()" data-i18n="a60">⟳ ВЫПОЛНИТЬ АНАЛИЗ ⟳</button>
 
     <!-- РЕЗУЛЬТАТЫ -->
     <div id="results" class="results-grid">
         <div class="results-top">
             <div class="chart-section">
-                <h3>🗿 ОППОЗИЦИОННЫЕ ТРАЕКТОРИИ</h3>
+                <h3 data-i18n="a6">🗿 ОППОЗИЦИОННЫЕ ТРАЕКТОРИИ</h3>
                 <svg id="radarSvg" class="radar-chart" viewBox="0 0 400 400"></svg>
                 <div class="legend-box">
-                    <span><span class="color-box cb-1"></span>русский</span>
-                    <span><span class="color-box cb-2"></span>қазақша</span>
-                    <span><span class="color-box cb-3"></span>EN исх.</span>
-                    <span><span class="color-box cb-4"></span>EN авт.</span>
+                    <span><span class="color-box cb-1"></span><span data-i18n="a200">русский</span></span>
+                    <span><span class="color-box cb-2"></span><span data-i18n="a201">қазақша</span></span>
+                    <span><span class="color-box cb-3"></span><span data-i18n="a202">EN исх.</span></span>
+                    <span><span class="color-box cb-4"></span><span data-i18n="a203">EN авт.</span></span>
                 </div>
                 <div id="shiftSummary" style="margin-top:15px; font-size:0.88rem; color:#2f1e0e;"></div>
             </div>
             <div class="metrics-section">
-                <h3>📊 ИНДЕКСЫ ОППОЗИЦИЙ</h3>
-                <p style="font-size:0.8rem; color:#4f351b; margin-bottom:8px;">0 = полностью полюс A · 1 = полностью полюс B</p>
+                <h3 data-i18n="a7">📊 ИНДЕКСЫ ОППОЗИЦИЙ</h3>
+                <p style="font-size:0.8rem; color:#4f351b; margin-bottom:8px;" data-i18n="a64">0 = полностью полюс A · 1 = полностью полюс B</p>
                 <div id="metricsList"></div>
                 <div class="colloc-block" style="margin-top:15px;">
-                    <h4>🔗 КОЛЛОКАЦИИ ключевых слов</h4>
+                    <h4 data-i18n="a10">🔗 КОЛЛОКАЦИИ ключевых слов</h4>
                     <div id="collocContent" class="colloc-grid" style="margin-top:8px;">—</div>
                 </div>
                 <div class="comment-box" style="margin-top:15px;">
-                    <h4>✏️ ЭКСПЕРТНЫЙ КОММЕНТАРИЙ</h4>
-                    <textarea id="expertComment" placeholder="Ваши наблюдения по этому сеансу..."></textarea>
-                    <button class="btn" style="margin-top:8px;" onclick="saveComment()">💾 СОХРАНИТЬ</button>
+                    <h4 data-i18n="a11">✏️ ЭКСПЕРТНЫЙ КОММЕНТАРИЙ</h4>
+                    <textarea id="expertComment" placeholder="Ваши наблюдения по этому сеансу..." data-i18n-ph="a74"></textarea>
+                    <button class="btn" style="margin-top:8px;" onclick="saveComment()" data-i18n="a79">💾 СОХРАНИТЬ</button>
                 </div>
             </div>
         </div>
 
         <!-- СТРАТЕГИИ -->
         <div class="strategy-panel">
-            <h3>🎯 DECONSTRUCTION ANALYZER STEPPE CODE</h3>
-            <p style="font-size:0.82rem; color:#4f351b; margin-bottom:15px;">Какие деколониальные стратегии представлены в каждой версии текста?</p>
+            <h3 data-i18n="a8">🎯 DECONSTRUCTION ANALYZER STEPPE CODE</h3>
+            <p style="font-size:0.82rem; color:#4f351b; margin-bottom:15px;" data-i18n="a65">Какие деколониальные стратегии представлены в каждой версии текста?</p>
             <div class="strat-grid" id="stratGrid"></div>
         </div>
     </div>
@@ -818,6 +839,270 @@ const STRATEGIES = {
     }
 };
 
+var I18N = {
+  ru: {
+  a1: 'Steppe Code: Deconstruction Analyzer',
+  a2: '📖 РЕДАКТОР БИНАРНЫХ ОППОЗИЦИЙ',
+  a3: '🔎 АВТОМАТИЧЕСКОЕ ПОПОЛНЕНИЕ СЛОВАРЯ',
+  a4: '🕰 ИСТОРИЯ АНАЛИЗОВ',
+  a5: '📂 ЗАГРУЗИТЬ ТЕКСТОВЫЙ ФАЙЛ',
+  a6: '🗿 ОППОЗИЦИОННЫЕ ТРАЕКТОРИИ',
+  a7: '📊 ИНДЕКСЫ ОППОЗИЦИЙ',
+  a8: '🎯 DECONSTRUCTION ANALYZER STEPPE CODE',
+  a9: '➕ ДОБАВИТЬ СЛОВО / PHRASE',
+  a10: '🔗 КОЛЛОКАЦИИ ключевых слов',
+  a11: '✏️ ЭКСПЕРТНЫЙ КОММЕНТАРИЙ',
+  a12: '${escapeHtml(opp)}',
+  a13: '📂 Модуль корпуса:',
+  a14: 'ID строк:',
+  a15: 'Сессия:',
+  a16: 'Загрузить в слот:',
+  a17: '— выберите —',
+  a18: 'Пирамида Каражартас (K-xx)',
+  a19: 'Петроглифы Сарыарки (P-xx)',
+  a20: 'Ботайская культура (B-xx)',
+  a21: 'Камень Тимура (T-xx)',
+  a22: 'Керамика бронзового века (C-xx)',
+  a23: 'Несколько модулей',
+  a24: 'Nomadic vs Sedentary',
+  a25: 'Civilization vs Barbarism',
+  a26: 'Ancient vs Modern',
+  a27: 'Nature vs Culture',
+  a28: 'East vs West (Orientalism)',
+  a29: 'Sacred vs Profane ★ нов.',
+  a30: 'Indigenous Agency vs Colonial Gaze ★ нов.',
+  a31: 'Полюс A (кочевой/автохтонный/сакральный/деколониальный)',
+  a32: 'Полюс B (оседлый/западный/профанный/колониальный)',
+  a33: 'Слот 1',
+  a34: 'Слот 2',
+  a35: 'Слот 3',
+  a36: 'Слот 4',
+  a37: 'Поддерживаемые форматы: .txt, .md, .csv',
+  a38: '.pdf, .docx, .doc',
+  a39: '${pole===\'A\'?\'Полюс A (автохт./деколон.)\':\'Полюс B (запад./колон.)\'}',
+  a40: 'Новых слов найдено: ${newWords.length}',
+  a41: 'Средний деколониальный сдвиг:',
+  a42: '📂 ЗАГРУЗИТЬ ФАЙЛ',
+  a43: '📚 СЛОВАРЬ',
+  a44: '🔍 НОВЫЕ СЛОВА',
+  a45: '🕰 ИСТОРИЯ АНАЛИЗОВ',
+  a46: '📥 ЭКСПОРТ (JSON)',
+  a47: '📤 ИМПОРТ',
+  a48: '🗑 ОЧИСТИТЬ ПОЛЯ',
+  a49: 'ДОБАВИТЬ',
+  a50: '🔎 НАЙТИ НОВЫЕ СЛОВА',
+  a51: '🗑 Очистить историю',
+  a52: '📄 .txt',
+  a53: '✕',
+  a54: '📄 .txt',
+  a55: '✕',
+  a56: '📄 .txt',
+  a57: '✕',
+  a58: '📄 .txt',
+  a59: '✕',
+  a60: '⟳ ВЫПОЛНИТЬ АНАЛИЗ ⟳',
+  a61: 'повышение · нейтрализация · экспликация · агентизация · деколониальный анализ дискурса',
+  a62: 'Вставьте тексты в поля ввода, затем нажмите кнопку. Программа покажет слова, которых ещё нет в словаре.',
+  a63: 'Перетащите файл в любое поле ниже или выберите файл и укажите, в какой слот его загрузить. Названия слотов можно переименовать — кликните прямо на заголовок поля.',
+  a64: '0 = полностью полюс A · 1 = полностью полюс B',
+  a65: 'Какие деколониальные стратегии представлены в каждой версии текста?',
+  a66: 'История пуста.',
+  a67: 'K-02, K-04, K-17...',
+  a68: 'сессия / дата',
+  a69: 'слово или словосочетание',
+  a70: 'Вставьте любой текст или загрузите .txt файл...',
+  a71: 'Вставьте любой текст или загрузите .txt файл...',
+  a72: 'Вставьте любой текст или загрузите .txt файл...',
+  a73: 'Вставьте любой текст или загрузите .txt файл...',
+  a74: 'Ваши наблюдения по этому сеансу...',
+  a75: 'Автоматически открыть сканер слов после загрузки\n            ',
+  a76: 'перетащите .txt или нажмите',
+  a77: '0 слов · 0 симв.',
+  a78: '✅ файл загружен',
+  a79: '💾 СОХРАНИТЬ',
+  a80: '1. РУССКИЙ',
+  a81: '2. ҚАЗАҚША',
+  a82: '3. ENGLISH (исх.)',
+  a83: '4. ENGLISH (авт.)',
+  a84: '➕ добавить',
+  a85: 'слов',
+  a86: 'симв.',
+  a87: 'деколон.',
+  a88: 'колон.',
+  a89: 'нейтр.',
+  a90: 'Полюс A (автохт./деколон.)',
+  a91: 'Полюс B (запад./колон.)',
+  a92: 'Введите хотя бы один текст',
+  a93: 'Импорт завершён. Словарь и история обновлены.',
+  a94: 'Файл "{name}" не поддерживается.\\n\\nПрограмма читает только текстовые файлы: .txt, .md, .csv\\n\\nДля PDF/DOCX: откройте файл → выделите весь текст (Ctrl+A) → скопируйте → вставьте в поле.',
+  a95: 'Ошибка чтения файла. Убедитесь, что файл не повреждён и сохранён в UTF-8.',
+  a96: 'Ошибка: ',
+  a97: 'Неверный формат',
+  a98: 'EN авт. сдвинут к деколониальному полюсу на ',
+  a99: ' относительно EN исх.',
+  a100: 'EN авт. сдвинут к колониальному полюсу на ',
+  a101: 'EN авт. и EN исх. имеют схожий баланс.',
+  a200: 'русский',
+  a201: 'қазақша',
+  a202: 'EN исх.',
+  a203: 'EN авт.',
+  a204: 'деколониальный сдвиг',
+  a205: 'колониальный сдвиг',
+  a206: 'нейтральный',
+  a207: 'Хранилище браузера недоступно в этом окне — словарь, история и подписи слотов будут работать только в течение текущей сессии и не сохранятся после перезагрузки страницы. Сам анализ и экспорт при этом работают без ограничений.',
+  a208: 'Вектор:',
+  a209: '— не указан —',
+  a210: 'Рецепция (EN → RU)',
+  a211: 'Экспорт (RU/KZ → EN)',
+  a212: 'Сдвиги:'
+},
+  en: {
+  a1: 'Steppe Code: Deconstruction Analyzer',
+  a2: '📖 BINARY OPPOSITION EDITOR',
+  a3: '🔎 AUTOMATIC DICTIONARY EXPANSION',
+  a4: '🕰 ANALYSIS HISTORY',
+  a5: '📂 LOAD A TEXT FILE',
+  a6: '🗿 OPPOSITIONAL TRAJECTORIES',
+  a7: '📊 OPPOSITION INDICES',
+  a8: '🎯 DECONSTRUCTION ANALYZER STEPPE CODE',
+  a9: '➕ ADD WORD / PHRASE',
+  a10: '🔗 KEYWORD COLLOCATIONS',
+  a11: '✏️ EXPERT COMMENT',
+  a12: '${escapeHtml(opp)}',
+  a13: '📂 Corpus module:',
+  a14: 'Segment IDs:',
+  a15: 'Session:',
+  a16: 'Load into slot:',
+  a17: '— choose —',
+  a18: 'Karazhartas Pyramid (K-xx)',
+  a19: 'Saryarka Petroglyphs (P-xx)',
+  a20: 'Botai Culture (B-xx)',
+  a21: 'Timur\'s Stone (T-xx)',
+  a22: 'Bronze Age Ceramics (C-xx)',
+  a23: 'Multiple modules',
+  a24: 'Nomadic vs Sedentary',
+  a25: 'Civilization vs Barbarism',
+  a26: 'Ancient vs Modern',
+  a27: 'Nature vs Culture',
+  a28: 'East vs West (Orientalism)',
+  a29: 'Sacred vs Profane ★ new',
+  a30: 'Indigenous Agency vs Colonial Gaze ★ new',
+  a31: 'Pole A (nomadic/indigenous/sacred/decolonial)',
+  a32: 'Pole B (sedentary/western/profane/colonial)',
+  a33: 'Slot 1',
+  a34: 'Slot 2',
+  a35: 'Slot 3',
+  a36: 'Slot 4',
+  a37: 'Supported formats: .txt, .md, .csv',
+  a38: '.pdf, .docx, .doc',
+  a39: '${pole===\'A\'?\'Pole A (indig./decolon.)\':\'Pole B (western/colon.)\'}',
+  a40: 'New words found: ${newWords.length}',
+  a41: 'Average decolonial shift:',
+  a42: '📂 LOAD FILE',
+  a43: '📚 DICTIONARY',
+  a44: '🔍 NEW WORDS',
+  a45: '🕰 ANALYSIS HISTORY',
+  a46: '📥 EXPORT (JSON)',
+  a47: '📤 IMPORT',
+  a48: '🗑 CLEAR FIELDS',
+  a49: 'ADD',
+  a50: '🔎 FIND NEW WORDS',
+  a51: '🗑 Clear history',
+  a52: '📄 .txt',
+  a53: '✕',
+  a54: '📄 .txt',
+  a55: '✕',
+  a56: '📄 .txt',
+  a57: '✕',
+  a58: '📄 .txt',
+  a59: '✕',
+  a60: '⟳ RUN ANALYSIS ⟳',
+  a61: 'upgrading · neutralisation · explication · agentisation · decolonial discourse analysis',
+  a62: 'Paste texts into the fields, then click the button. The program will show words that aren\'t in the dictionary yet.',
+  a63: 'Drag a file onto any field below, or choose a file and pick which slot to load it into. Slot names can be renamed — click directly on the field\'s title.',
+  a64: '0 = fully pole A · 1 = fully pole B',
+  a65: 'Which decolonial strategies are present in each version of the text?',
+  a66: 'History is empty.',
+  a67: 'K-02, K-04, K-17...',
+  a68: 'session / date',
+  a69: 'word or phrase',
+  a70: 'Paste any text or upload a .txt file...',
+  a71: 'Paste any text or upload a .txt file...',
+  a72: 'Paste any text or upload a .txt file...',
+  a73: 'Paste any text or upload a .txt file...',
+  a74: 'Your observations on this session...',
+  a75: 'Automatically open the word scanner after loading',
+  a76: 'drag a .txt here or click',
+  a77: '0 words · 0 chars.',
+  a78: '✅ file loaded',
+  a79: '💾 SAVE',
+  a80: '1. RUSSIAN',
+  a81: '2. KAZAKH',
+  a82: '3. ENGLISH (source)',
+  a83: '4. ENGLISH (authored)',
+  a84: '➕ add',
+  a85: 'words',
+  a86: 'chars.',
+  a87: 'decolon.',
+  a88: 'colon.',
+  a89: 'neutral',
+  a90: 'Pole A (indig./decolon.)',
+  a91: 'Pole B (western/colon.)',
+  a92: 'Enter at least one text',
+  a93: 'Import complete. Dictionary and history updated.',
+  a94: 'The file "{name}" is not supported.\\n\\nThe program only reads plain-text files: .txt, .md, .csv\\n\\nFor PDF/DOCX: open the file → select all text (Ctrl+A) → copy → paste it into the field.',
+  a95: 'Could not read the file. Make sure it isn\'t corrupted and is saved as UTF-8.',
+  a96: 'Error: ',
+  a97: 'Invalid format',
+  a98: 'EN-authored is shifted toward the decolonial pole by ',
+  a99: ' relative to EN-source.',
+  a100: 'EN-authored is shifted toward the colonial pole by ',
+  a101: 'EN-authored and EN-source show a similar balance.',
+  a200: 'Russian',
+  a201: 'Kazakh',
+  a202: 'EN source',
+  a203: 'EN authored',
+  a204: 'decolonial shift',
+  a205: 'colonial shift',
+  a206: 'neutral',
+  a207: 'Browser storage is unavailable in this window — the dictionary, history and slot labels will only work for the current session and won\'t be saved after the page reloads. Analysis and export still work without any limitations.',
+  a208: 'Vector:',
+  a209: '— not specified —',
+  a210: 'Reception (EN → RU)',
+  a211: 'Export (RU/KZ → EN)',
+  a212: 'Shifts:'
+}
+};
+
+/* ================= i18n (RU/EN) ================= */
+var currentLang = 'ru';
+function i18n(key){
+  var dict = I18N[currentLang] || I18N.ru;
+  if (dict && Object.prototype.hasOwnProperty.call(dict, key)) return dict[key];
+  if (I18N.ru && Object.prototype.hasOwnProperty.call(I18N.ru, key)) return I18N.ru[key];
+  return key;
+}
+function applyStaticI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.textContent = i18n(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    el.setAttribute('placeholder', i18n(el.getAttribute('data-i18n-ph')));
+  });
+}
+function setLang(lang){
+  if (lang !== 'ru' && lang !== 'en') return;
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === lang); });
+  document.documentElement.setAttribute('lang', lang);
+  applyStaticI18n();
+  // Пересобираем динамически генерируемые панели (словарь, история, коллокации),
+  // чтобы встроенные в них подписи тоже сменили язык. Содержимое текстовых полей
+  // (сами анализируемые тексты) не трогаем — это данные пользователя, не интерфейс.
+  if (typeof renderDictLists === 'function') renderDictLists();
+  if (typeof renderHistory === 'function') renderHistory();
+}
+
 // ========== БЕЗОПАСНОЕ ХРАНИЛИЩЕ ==========
 // В некоторых песочницах (например, при просмотре как встроенный артефакт) обращение
 // к localStorage может выбросить исключение. Без этой обёртки это ломало ВСЮ программу:
@@ -861,7 +1146,7 @@ function renderDictLists() {
         col.innerHTML = `<h4>${escapeHtml(opp)}</h4>`;
         ['A','B'].forEach(pole => {
             const sub = document.createElement('div');
-            sub.innerHTML = `<strong style="font-size:0.82rem; color:#4f351b;">${pole==='A'?'Полюс A (автохт./деколон.)':'Полюс B (запад./колон.)'}</strong>`;
+            sub.innerHTML = `<strong style="font-size:0.82rem; color:#4f351b;">${pole==='A'?i18n('a90'):i18n('a91')}</strong>`;
             const ul = document.createElement('ul');
             ul.className = 'word-list';
             dict[opp][pole].forEach((w, idx) => {
@@ -900,9 +1185,9 @@ window.scanNewWords = function() {
     const existing = new Set();
     Object.values(dict).forEach(opp => { opp.A.forEach(w=>existing.add(w)); opp.B.forEach(w=>existing.add(w)); });
     const newWords = [...new Set(words)].filter(w=>!existing.has(w) && w.length>3).sort().slice(0,60);
-    let html = `<p><strong>Новых слов найдено: ${newWords.length}</strong></p>`;
+    let html = `<p><strong>${i18n('a40')}${newWords.length}</strong></p>`;
     newWords.forEach(w => {
-        html += `<div class="scan-item"><span>${escapeHtml(w)}</span><button class="btn" style="padding:2px 10px;" onclick="quickAdd('${escapeAttr(escapeJs(w))}')">➕ добавить</button></div>`;
+        html += `<div class="scan-item"><span>${escapeHtml(w)}</span><button class="btn" style="padding:2px 10px;" onclick="quickAdd('${escapeAttr(escapeJs(w))}')">${i18n('a84')}</button></div>`;
     });
     document.getElementById('scanResults').innerHTML = html;
 };
@@ -969,7 +1254,7 @@ function getCollocations(text, keywords, windowSize=3) {
 // ========== ОСНОВНОЙ АНАЛИЗ ==========
 function performAnalysis() {
     const texts = [1,2,3,4].map(i => document.getElementById(`text${i}`).value);
-    if (texts.every(t=>!t.trim())) { alert('Введите хотя бы один текст'); return; }
+    if (texts.every(t=>!t.trim())) { alert(i18n('a92')); return; }
 
     const results = texts.map(t => analyzeText(t));
     const strats = texts.map(t => detectStrategies(t));
@@ -987,27 +1272,27 @@ function performAnalysis() {
             const d = results[ti].data[i];
             const idx = d.index;
             let badge = '';
-            if (idx < 0.35) badge = `<span class="shift-badge shift-decolon">↑ деколон.</span>`;
-            else if (idx > 0.65) badge = `<span class="shift-badge shift-colonial">↓ колон.</span>`;
-            else badge = `<span class="shift-badge shift-neutral">≈ нейтр.</span>`;
+            if (idx < 0.35) badge = `<span class="shift-badge shift-decolon">↑ ${i18n('a87')}</span>`;
+            else if (idx > 0.65) badge = `<span class="shift-badge shift-colonial">↓ ${i18n('a88')}</span>`;
+            else badge = `<span class="shift-badge shift-neutral">≈ ${i18n('a89')}</span>`;
             html += `<div class="data-row"><span><span class="color-box ${colors[ti]}"></span>${labels[ti]}</span><span>${idx.toFixed(2)} (A:${d.countA} B:${d.countB})${badge}</span></div>`;
         });
     });
     document.getElementById('metricsList').innerHTML = html;
 
     // --- СДВИГ SUMMARY ---
-    let shiftHtml = '<strong>Средний деколониальный сдвиг:</strong><br>';
+    let shiftHtml = '<strong>' + i18n('a41') + '</strong><br>';
     texts.forEach((t,ti) => {
         if (!t.trim()) return;
         const avg = results[ti].avgShift;
-        const dir = avg < 0.45 ? '⬆ деколониальный сдвиг' : avg > 0.55 ? '⬇ колониальный сдвиг' : '↔ нейтральный';
+        const dir = avg < 0.45 ? '⬆ ' + i18n('a204') : avg > 0.55 ? '⬇ ' + i18n('a205') : '↔ ' + i18n('a206');
         shiftHtml += `<span class="color-box ${colors[ti]}"></span> ${labels[ti]}: <b>${avg.toFixed(2)}</b> ${dir}<br>`;
     });
     if (texts[2].trim() && texts[3].trim()) {
         const diff = results[2].avgShift - results[3].avgShift;
-        if (diff > 0.05) shiftHtml += `<br>✅ EN авт. сдвинут к деколониальному полюсу на <b>${diff.toFixed(2)}</b> относительно EN исх.`;
-        else if (diff < -0.05) shiftHtml += `<br>⚠️ EN авт. сдвинут к колониальному полюсу на <b>${Math.abs(diff).toFixed(2)}</b> относительно EN исх.`;
-        else shiftHtml += '<br>≈ EN авт. и EN исх. имеют схожий баланс.';
+        if (diff > 0.05) shiftHtml += `<br>✅ ${i18n('a98')}<b>${diff.toFixed(2)}</b>${i18n('a99')}`;
+        else if (diff < -0.05) shiftHtml += `<br>⚠️ ${i18n('a100')}<b>${Math.abs(diff).toFixed(2)}</b>${i18n('a99')}`;
+        else shiftHtml += '<br>≈ ' + i18n('a101');
     }
     document.getElementById('shiftSummary').innerHTML = shiftHtml;
 
@@ -1052,12 +1337,14 @@ function performAnalysis() {
     const history = getHistory();
     const module = document.getElementById('corpusModule').value;
     const ids = document.getElementById('corpusIds').value;
+    const vector = document.getElementById('translationVector').value;
     const sess = document.getElementById('sessionLabel').value || new Date().toLocaleString('ru');
     history.unshift({
         ts: new Date().toISOString(),
         label: sess,
         module: module,
         ids: ids,
+        vector: vector,
         avgShifts: texts.map((t,ti) => t.trim() ? results[ti].avgShift.toFixed(2) : null),
         comment: document.getElementById('expertComment').value
     });
@@ -1110,10 +1397,11 @@ function drawRadar(labels, datasets, active) {
 function renderHistory() {
     const h = getHistory();
     const c = document.getElementById('historyList');
-    if (!h.length) { c.innerHTML = '<p>История пуста.</p>'; return; }
+    if (!h.length) { c.innerHTML = '<p>' + i18n('a66') + '</p>'; return; }
+    const vectorLabel = { reception: i18n('a210'), export: i18n('a211') };
     c.innerHTML = h.map(e => `<div class="history-entry">
-        <div class="he-meta">📂 ${escapeHtml(e.module||'—')} · ID: ${escapeHtml(e.ids||'—')} · ${escapeHtml(e.label)}</div>
-        <div class="he-scores">Сдвиги: ${(e.avgShifts||[]).map((s,i)=>s!==null?`[${['RU','KK','EN','EN↑'][i]}:${s}]`:'').filter(Boolean).join(' ')}</div>
+        <div class="he-meta">📂 ${escapeHtml(e.module||'—')} · ID: ${escapeHtml(e.ids||'—')} · ${escapeHtml(e.label)}${e.vector ? ' · <b>' + escapeHtml(vectorLabel[e.vector] || e.vector) + '</b>' : ''}</div>
+        <div class="he-scores">${i18n('a212')} ${(e.avgShifts||[]).map((s,i)=>s!==null?`[${['RU','KK','EN','EN↑'][i]}:${s}]`:'').filter(Boolean).join(' ')}</div>
         ${e.comment ? `<div style="font-style:italic; font-size:0.82rem; margin-top:4px;">"${escapeHtml(e.comment)}"</div>` : ''}
     </div>`).join('');
 }
@@ -1131,6 +1419,7 @@ window.exportAll = function() {
         module: document.getElementById('corpusModule')?.value || '',
         corpusIds: document.getElementById('corpusIds')?.value || '',
         session: document.getElementById('sessionLabel')?.value || '',
+        vector: document.getElementById('translationVector')?.value || '',
         timestamp: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -1150,7 +1439,7 @@ window.importDictionary = function(e) {
             const parsed = JSON.parse(ev.target.result);
             // Поддержка как прямого словаря, так и экспорт-обёртки
             const rawDict = parsed.dictionary || parsed;
-            if (typeof rawDict !== 'object' || Array.isArray(rawDict)) throw new Error('Неверный формат');
+            if (typeof rawDict !== 'object' || Array.isArray(rawDict)) throw new Error(i18n('a97'));
             // нормализуем каждую ось, чтобы отсутствующие/повреждённые A или B не роняли анализ позже
             const dict = {};
             Object.keys(rawDict).forEach(key => {
@@ -1162,8 +1451,8 @@ window.importDictionary = function(e) {
             });
             saveDict(dict);
             if (parsed.history && Array.isArray(parsed.history)) saveHistory(parsed.history);
-            alert('Импорт завершён. Словарь и история обновлены.');
-        } catch(err) { alert('Ошибка: ' + err.message); }
+            alert(i18n('a93'));
+        } catch(err) { alert(i18n('a96') + err.message); }
         e.target.value = '';
     };
     reader.readAsText(file);
@@ -1207,13 +1496,17 @@ function saveLabel(n) {
     const labels = getLabels();
     labels[n-1] = el.textContent.trim() || DEFAULT_LABELS[n-1];
     el.textContent = labels[n-1];
+    el.removeAttribute('data-i18n'); // название слота теперь пользовательские данные — язык интерфейса больше их не переписывает
     safeSet('slotLabelsV2', JSON.stringify(labels));
 }
 function restoreLabels() {
     const labels = getLabels();
     [1,2,3,4].forEach(n => {
         const el = document.getElementById(`label${n}`);
-        if (el) el.textContent = labels[n-1];
+        if (el && labels[n-1] !== DEFAULT_LABELS[n-1]) {
+            el.textContent = labels[n-1];
+            el.removeAttribute('data-i18n');
+        }
     });
 }
 
@@ -1222,7 +1515,7 @@ function updateCount(n) {
     const text = document.getElementById(`text${n}`).value;
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
     const chars = text.length;
-    document.getElementById(`wc${n}`).textContent = `${words} слов · ${chars} симв.`;
+    document.getElementById(`wc${n}`).textContent = `${words} ${i18n('a85')} · ${chars} ${i18n('a86')}`;
 }
 
 // ========== CLEAR SLOT ==========
@@ -1241,12 +1534,12 @@ function readTextFile(file, callback) {
     const ext = file.name.split('.').pop().toLowerCase();
     const allowedExts = ['txt','md','csv','log','html','htm'];
     if (!allowedExts.includes(ext)) {
-        alert(`Файл "${file.name}" не поддерживается.\n\nПрограмма читает только текстовые файлы: .txt, .md, .csv\n\nДля PDF/DOCX: откройте файл → выделите весь текст (Ctrl+A) → скопируйте → вставьте в поле.`);
+        alert(i18n('a94').replace('{name}', file.name));
         return;
     }
     const reader = new FileReader();
     reader.onload = function(e) { callback(e.target.result, file.name); };
-    reader.onerror = function() { alert('Ошибка чтения файла. Убедитесь, что файл не повреждён и сохранён в UTF-8.'); };
+    reader.onerror = function() { alert(i18n('a95')); };
     reader.readAsText(file, 'UTF-8');
 }
 
@@ -1255,7 +1548,7 @@ function putTextInSlot(text, filename, slotNum) {
     updateCount(slotNum);
     const badge = document.getElementById(`badge${slotNum}`);
     if (badge) {
-        badge.textContent = `✅ ${filename} (${text.length} симв.)`;
+        badge.textContent = `✅ ${filename} (${text.length} ${i18n('a86')})`;
         badge.style.display = 'block';
     }
     // Auto-scroll to the slot
@@ -1331,13 +1624,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.onload = function() {
+    applyStaticI18n();
     renderDictLists();
     restoreLabels();
     [1,2,3,4].forEach(n => updateCount(n));
     if (!storageAvailable) {
         const notice = document.createElement('div');
         notice.style.cssText = 'max-width:1520px;margin:0 auto 10px;padding:8px 16px;background:#3a1a10;color:#f4c8a8;border:1px solid var(--terra);border-radius:2px;font-size:0.8rem;text-align:center;';
-        notice.textContent = '⚠ Хранилище браузера недоступно в этом окне — словарь, история и подписи слотов будут работать только в течение текущей сессии и не сохранятся после перезагрузки страницы. Сам анализ и экспорт при этом работают без ограничений.';
+        notice.textContent = '⚠ ' + i18n('a207');
         document.body.insertBefore(notice, document.body.firstChild);
     }
 };
